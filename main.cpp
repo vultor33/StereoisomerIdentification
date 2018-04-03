@@ -6,8 +6,40 @@
 #include <QMdiArea>
 #include <QLCDNumber>
 #include <QMainWindow>
+#include <QMdiSubWindow>
+#include <QObjectPicker>
+#include <Qt3DRender>
 
 #include "showmolecule.h"
+
+class Counter : public QObject
+{
+    Q_OBJECT
+
+public:
+    Counter() { m_value = 0; }
+
+    int value() const { return m_value; }
+
+public slots:
+    void setValue(int value){ m_value = value;}
+
+signals:
+    void valueChanged(int newValue)
+    {
+        if (newValue != m_value) {
+            m_value = newValue;
+            emit valueChanged(newValue);
+        }
+    }
+
+private:
+    int m_value;
+};
+
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -29,7 +61,8 @@ int main(int argc, char *argv[])
     camController->setLookSpeed( 180.0f );
     camController->setCamera(camera);
     view.setRootEntity(scene);
-    view.show();
+    //
+
     QWidget *molBox = QWidget::createWindowContainer(&view);
 
     QMdiArea *centralWidget = new QMdiArea;
@@ -38,11 +71,27 @@ int main(int argc, char *argv[])
     lcd->setMinimumSize(250, 100);
     centralWidget->addSubWindow(lcd);
     centralWidget->addSubWindow(molBox);
+    QList<QMdiSubWindow *> subList = centralWidget->subWindowList();
+    subList[1]->setFixedHeight(200);
+    subList[1]->setFixedWidth(200);
+    subList[1]->move(QPoint(100,100));
+    subList[1]->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+
+
+
+    //Input
+//    addComponent(objectPicker);
+
+
+
+
     w.setCentralWidget(centralWidget);
     //w.resize(800, 600);
+    view.show();
     w.show();
 
     mol_.moveMolecule(10);
+    mol_.createPicker();
 
     return a.exec();
 }

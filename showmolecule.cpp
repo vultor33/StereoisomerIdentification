@@ -1,5 +1,6 @@
 #include "showmolecule.h"
 
+#include <QObject>
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
 #include <Qt3DCore/QAspectEngine>
@@ -10,12 +11,20 @@
 #include <Qt3DExtras/QCylinderMesh>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QTorusMesh>
+#include <Qt3DRender>
+#include <QObjectPicker>
+#include <QPickEvent>
 
 
-ShowMolecule::ShowMolecule()
+ShowMolecule::ShowMolecule() :
+    mol(nullptr),
+    sphereTransform(nullptr),
+    material2(nullptr),
+    objectPicker(nullptr)
 {
 
 }
+
 
 void ShowMolecule::createMolecule()
 {
@@ -26,9 +35,10 @@ void ShowMolecule::createMolecule()
     Qt3DRender::QMaterial *material = new Qt3DExtras::QPhongMaterial(rootEntity);
 
     // Torus
+    /*
     Qt3DCore::QEntity *torusEntity = new Qt3DCore::QEntity(rootEntity);
     Qt3DExtras::QTorusMesh *torusMesh = new Qt3DExtras::QTorusMesh;
-    torusMesh->setRadius(5);
+    torusMesh->setRadius(10);
     torusMesh->setMinorRadius(1);
     torusMesh->setRings(100);
     torusMesh->setSlices(20);
@@ -40,6 +50,7 @@ void ShowMolecule::createMolecule()
     torusEntity->addComponent(torusMesh);
     torusEntity->addComponent(torusTransform);
     torusEntity->addComponent(material);
+*/
 
     // Cyllineter
     Qt3DCore::QEntity *cyllinderEntity = new Qt3DCore::QEntity(rootEntity);
@@ -65,7 +76,7 @@ void ShowMolecule::createMolecule()
     sphereMesh->setRadius(3);
     sphereTransform = new Qt3DCore::QTransform;
     sphereTransform->setTranslation(QVector3D(20,2,0));
-    Qt3DExtras::QPhongMaterial *material2 = new Qt3DExtras::QPhongMaterial(rootEntity);
+    material2 = new Qt3DExtras::QPhongMaterial(rootEntity);
     material2->setAmbient(Qt::red);
 
     sphereEntity->addComponent(sphereMesh);
@@ -73,6 +84,8 @@ void ShowMolecule::createMolecule()
     sphereEntity->addComponent(material2);
 
     mol = rootEntity;
+
+
 }
 
 void ShowMolecule::moveMolecule(qreal x)
@@ -84,3 +97,39 @@ Qt3DCore::QEntity *ShowMolecule::getMolecule()
 {
     return mol;
 }
+
+void ShowMolecule::createPicker()
+{
+    objectPicker = new Qt3DRender::QObjectPicker(mol);
+    objectPicker->setHoverEnabled(false);
+    objectPicker->setDragEnabled(false);
+    connect(
+               objectPicker,
+               SIGNAL(clicked(Qt3DRender::QPickEvent*)),
+               //this,
+                //SIGNAL(testaSinal(Qt3DRender::QPickEvent*)),
+                this,
+                SLOT(processTouched(Qt3DRender::QPickEvent*)));
+                //SLOT(empty()));
+    mol->addComponent(objectPicker);
+}
+
+
+
+// SLOTS
+/* */
+void ShowMolecule::processTouched(Qt3DRender::QPickEvent *event)
+{
+    //Ignore pick events if the entity is disabled
+//    if (!isEnabled()) {
+//        event->setAccepted(false);
+//        return;
+//    }
+
+    //inform that the tile has been touched
+    material2->setAmbient(Qt::blue);
+    qDebug() << "tile touched";
+    event->setAccepted(true);
+}
+
+
