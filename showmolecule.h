@@ -47,6 +47,7 @@ private:
     void atomsConnections(int atomA, int atomB, int bondI);
 
     // Picker functions
+    QList<bool> atomsListHighlighted;
     Qt3DRender::QObjectPicker *objectPicker;
     int atomPicked(QVector3D &worldInter);
 

@@ -39,6 +39,7 @@ void ShowMolecule::createMolecule()
         sphereListMesh << sphereMeshI;
         sphereListTransform << sphereTransformI;
         sphereListMaterial << sphereMaterialI;
+        atomsListHighlighted << false;
 
         Qt3DExtras::QCylinderMesh *cylinderMeshI = new Qt3DExtras::QCylinderMesh;
         Qt3DCore::QTransform *cylinderTransformI = new Qt3DCore::QTransform;
@@ -67,7 +68,7 @@ void ShowMolecule::createSphere(
     Qt3DCore::QEntity *sphereEntityI = new Qt3DCore::QEntity(mol);
     sphereMeshI->setRadius(3);
     sphereTransformI->setTranslation(QVector3D(0,0,0));
-    sphereMaterialI->setAmbient(Qt::black);
+    sphereMaterialI->setAmbient(Qt::green);
     sphereEntityI->addComponent(sphereMeshI);
     sphereEntityI->addComponent(sphereTransformI);
     sphereEntityI->addComponent(sphereMaterialI);
@@ -156,9 +157,31 @@ int ShowMolecule::atomPicked(QVector3D &worldInter)
         QVector3D rApick = worldInter - sphereListTransform[i]->translation();
         qDebug() << "translation:  i: " << i << "  " << sphereListTransform[i]->translation();
         qDebug() << "rpick:  " << rApick;
-        if((rApick.length()) < sphereListMesh[i]->radius())
+        if((rApick.length()) < (sphereListMesh[i]->radius() + 1.0e0))
         {
-            sphereListMaterial[i]->setAmbient(Qt::blue);
+            //selects just one
+            for(int j = 0; j < atomsListHighlighted.size(); j++)
+            {
+                if(atomsListHighlighted[j])
+                {
+                    if(i == j)
+                    {
+                        sphereListMaterial[j]->setAmbient(Qt::blue);
+                        atomsListHighlighted[j] = false;
+                        return i;
+                    }
+                    else
+                    {
+                        sphereListMaterial[j]->setAmbient(Qt::blue);
+                        atomsListHighlighted[j] = false;
+                        sphereListMaterial[i]->setAmbient(Qt::black);
+                        atomsListHighlighted[i] = true;
+                        return i;
+                    }
+                }
+            }
+            sphereListMaterial[i]->setAmbient(Qt::black);
+            atomsListHighlighted[i] = true;
             return i;
         }
     }
