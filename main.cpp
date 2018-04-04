@@ -10,6 +10,15 @@
 #include <QObjectPicker>
 #include <Qt3DRender>
 #include <QCamera>
+#include <QFile>
+#include <QTextStream>
+#include <QString>
+#include <QStringList>
+#include <QMessageBox>
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <QViewport>
 
 #include "showmolecule.h"
 
@@ -42,10 +51,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     QMainWindow w;
-    //w.show();
 
     ShowMolecule mol_;
-    mol_.createMolecule();
+    QString fileName = "C:\\Users\\basta\\Documents\\Visual Studio 2015\\Projects\\Qt-Projects\\visual-3\\t4-isomer.mol2";
+    mol_.createMolecule(fileName);
     Qt3DExtras::Qt3DWindow view;
     Qt3DCore::QEntity *scene = mol_.getMolecule();
     Qt3DRender::QCamera *camera = view.camera();
@@ -57,6 +66,8 @@ int main(int argc, char *argv[])
     camController->setLookSpeed( 180.0f );
     camController->setCamera(camera);
     view.setRootEntity(scene);
+//    view.show();
+//    return a.exec();
 
     QWidget *molBox = QWidget::createWindowContainer(&view);
 
@@ -73,12 +84,25 @@ int main(int argc, char *argv[])
     subList[1]->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
 
+    Qt3DRender::QRenderSettings *renderSettingsComponent = new Qt3DRender::QRenderSettings(scene);
+    Qt3DExtras::QForwardRenderer *forwardRenderer = view.defaultFrameGraph();
+    renderSettingsComponent->setActiveFrameGraph(forwardRenderer);
+    Qt3DRender::QPickingSettings *pickingSettings = renderSettingsComponent->pickingSettings();
+    pickingSettings->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
+    pickingSettings->setPickMethod(Qt3DRender::QPickingSettings::TrianglePicking);
+
+    scene->addComponent(renderSettingsComponent);
+    qDebug() << "components:  " << scene->components();
+
+
+
+
     w.setCentralWidget(centralWidget);
     //w.resize(800, 600);
     view.show();
     w.show();
 
-//    mol_.createPicker();
+//    mol_.readMol2Format(fileName);
 
     return a.exec();
 }

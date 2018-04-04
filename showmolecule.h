@@ -14,20 +14,22 @@ class ShowMolecule : QObject
 public:
     ShowMolecule();
 
-    void createMolecule();
-
-    void createPicker();
+    void createMolecule(QString &fileName);
 
     Qt3DCore::QEntity *getMolecule();
-
-    void moveMolecule(qreal x);
-
-
-    void repositionAtoms();
 
 
 private:
     Qt3DCore::QEntity * mol;
+
+    //molecule characteristics
+    void readMol2Format(QString &fileName);
+    QString molName;
+    int nAtoms, nBonds;
+    QList<QString> atomLabels;
+    QList<QVector3D> atomCoordinates;
+    QList<int> connectionsA;
+    QList<int> connectionsB;
 
     // Solids definitions
     QList<Qt3DExtras::QSphereMesh*> sphereListMesh;
@@ -47,22 +49,17 @@ private:
     void atomsConnections(int atomA, int atomB, int bondI);
 
     // Picker functions
+    void createPicker();
     QList<bool> atomsListHighlighted;
     Qt3DRender::QObjectPicker *objectPicker;
     int atomPicked(QVector3D &worldInter);
 
-
-
+    //emitir um sinal com atompicked e o numero que foi selecionado
 
 
 
 public slots:
     void processTouched(Qt3DRender::QPickEvent *event);
-
-    void empty(){}
-
-signals:
-    void testaSinal(Qt3DRender::QPickEvent*);
 
 };
 
