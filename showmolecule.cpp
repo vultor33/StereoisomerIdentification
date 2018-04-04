@@ -20,160 +20,32 @@
 #include <QComponentVector>
 
 ShowMolecule::ShowMolecule() :
+    molWindow(nullptr),
     mol(nullptr),
     objectPicker(nullptr)
 {
 
 }
 
-
-void ShowMolecule::createMolecule(QString &fileName)
+Qt3DExtras::Qt3DWindow *ShowMolecule::loadMolecule(QString &fileName)
 {
-    mol = new Qt3DCore::QEntity;
+    molWindow = new Qt3DExtras::Qt3DWindow;
 
     readMol2Format(fileName);
 
+    createMolecule();
 
-    for(int  i = 0; i < nAtoms; i++)
-    {
-        Qt3DExtras::QSphereMesh *sphereMeshI = new Qt3DExtras::QSphereMesh;
-        Qt3DCore::QTransform *sphereTransformI = new Qt3DCore::QTransform;
-        Qt3DExtras::QPhongMaterial *sphereMaterialI = new Qt3DExtras::QPhongMaterial(mol);
-        createSphere(sphereMeshI,sphereTransformI,sphereMaterialI);
-        sphereListMesh << sphereMeshI;
-        sphereListTransform << sphereTransformI;
-        sphereListMaterial << sphereMaterialI;
-        atomsListHighlighted << false;
-
-        sphereListTransform[i]->setTranslation(atomCoordinates[i]);
-    }
-
-    for(int i = 0; i < nBonds; i++)
-    {
-        Qt3DExtras::QCylinderMesh *cylinderMeshI = new Qt3DExtras::QCylinderMesh;
-        Qt3DCore::QTransform *cylinderTransformI = new Qt3DCore::QTransform;
-        Qt3DExtras::QPhongMaterial *cylinderMaterialI = new Qt3DExtras::QPhongMaterial(mol);
-        createCylinder(cylinderMeshI,cylinderTransformI,cylinderMaterialI);
-        cylinderListMesh << cylinderMeshI;
-        cylinderListTransform << cylinderTransformI;
-        cylinderListMaterial << cylinderMaterialI;
-
-        atomsConnections(connectionsA[i], connectionsB[i], i);
-    }
+    createCamera();
 
     createPicker();
 
+    molWindow->setRootEntity(mol);
+
+    return molWindow;
 
 }
 
-void ShowMolecule::createSphere(
-        Qt3DExtras::QSphereMesh *sphereMeshI,
-        Qt3DCore::QTransform *sphereTransformI,
-        Qt3DExtras::QPhongMaterial *sphereMaterialI)
-{
-    Qt3DCore::QEntity *sphereEntityI = new Qt3DCore::QEntity(mol);
-    sphereMeshI->setRadius(3);
-    sphereTransformI->setTranslation(QVector3D(0,0,0));
-    sphereMaterialI->setAmbient(Qt::green);
-    sphereEntityI->addComponent(sphereMeshI);
-    sphereEntityI->addComponent(sphereTransformI);
-    sphereEntityI->addComponent(sphereMaterialI);
-}
 
-void ShowMolecule::createCylinder(
-        Qt3DExtras::QCylinderMesh *cylinderMeshI,
-        Qt3DCore::QTransform *cylinderTransformI,
-        Qt3DExtras::QPhongMaterial *cylinderMaterialI)
-{
-    Qt3DCore::QEntity *cylinderEntityI = new Qt3DCore::QEntity(mol);
-    cylinderMeshI->setRadius(0.01);
-    cylinderMeshI->setLength(1);
-    cylinderTransformI->setTranslation(QVector3D(0,0,0));
-    cylinderMaterialI->setAmbient(Qt::gray);
-    cylinderEntityI->addComponent(cylinderMeshI);
-    cylinderEntityI->addComponent(cylinderTransformI);
-    cylinderEntityI->addComponent(cylinderMaterialI);
-}
-
-void ShowMolecule::atomsConnections(int atomA, int atomB, int bondI)
-{
-    QVector3D rAB = sphereListTransform[atomA]->translation()-sphereListTransform[atomB]->translation();
-    cylinderListTransform[bondI]->setRotation(QQuaternion::rotationTo(QVector3D(0,1,0), rAB));
-    cylinderListMesh[bondI]->setLength(rAB.length());
-    cylinderListTransform[bondI]->setTranslation(QVector3D(
-                                                 sphereListTransform[atomB]->translation()+rAB/2.0e0));
-}
-
-
-Qt3DCore::QEntity *ShowMolecule::getMolecule()
-{
-    return mol;
-}
-
-void ShowMolecule::createPicker()
-{
-    objectPicker = new Qt3DRender::QObjectPicker(mol);
-    objectPicker->setHoverEnabled(false);
-    objectPicker->setDragEnabled(false);
-
-    //Qt3DRender::QPickingSettings *settings -- need QRenderSettings.
-
-    connect(
-               objectPicker,
-               SIGNAL(clicked(Qt3DRender::QPickEvent*)),
-               this,
-               SLOT(processTouched(Qt3DRender::QPickEvent*)));
-
-    mol->addComponent(objectPicker);
-}
-
-
-
-// SLOTS
-void ShowMolecule::processTouched(Qt3DRender::QPickEvent *event)
-{
-    QVector3D inter = event->localIntersection();
-
-    qDebug() << "pick:  " << inter << "  atom:  " << atomPicked(inter);
-
-    event->setAccepted(true);
-}
-
-int ShowMolecule::atomPicked(QVector3D &worldInter)
-{
-    for(int i = 0; i < sphereListTransform.size(); i++)
-    {
-        QVector3D rApick = worldInter - sphereListTransform[i]->translation();
-        if((rApick.length()) < (sphereListMesh[i]->radius() + 5.0e0))
-        {
-            //selects just one
-            for(int j = 0; j < atomsListHighlighted.size(); j++)
-            {
-                if(atomsListHighlighted[j])
-                {
-                    if(i == j)
-                    {
-                        sphereListMaterial[j]->setAmbient(Qt::blue);
-                        atomsListHighlighted[j] = false;
-                        return i;
-                    }
-                    else
-                    {
-                        sphereListMaterial[j]->setAmbient(Qt::blue);
-                        atomsListHighlighted[j] = false;
-                        sphereListMaterial[i]->setAmbient(Qt::black);
-                        atomsListHighlighted[i] = true;
-                        return i;
-                    }
-                }
-            }
-            sphereListMaterial[i]->setAmbient(Qt::black);
-            atomsListHighlighted[i] = true;
-            return i;
-        }
-    }
-    return -1;
-}
 
 void ShowMolecule::readMol2Format(QString &fileName)
 {
@@ -250,23 +122,157 @@ void ShowMolecule::readMol2Format(QString &fileName)
     file.close();
 }
 
+void ShowMolecule::createMolecule()
+{
+    mol = new Qt3DCore::QEntity;
+
+    for(int  i = 0; i < nAtoms; i++)
+    {
+        Qt3DExtras::QSphereMesh *sphereMeshI = new Qt3DExtras::QSphereMesh;
+        Qt3DCore::QTransform *sphereTransformI = new Qt3DCore::QTransform;
+        Qt3DExtras::QPhongMaterial *sphereMaterialI = new Qt3DExtras::QPhongMaterial(mol);
+        createSphere(sphereMeshI,sphereTransformI,sphereMaterialI);
+        sphereListMesh << sphereMeshI;
+        sphereListTransform << sphereTransformI;
+        sphereListMaterial << sphereMaterialI;
+        atomsListHighlighted << false;
+
+        sphereListTransform[i]->setTranslation(atomCoordinates[i]);
+    }
+
+    for(int i = 0; i < nBonds; i++)
+    {
+        Qt3DExtras::QCylinderMesh *cylinderMeshI = new Qt3DExtras::QCylinderMesh;
+        Qt3DCore::QTransform *cylinderTransformI = new Qt3DCore::QTransform;
+        Qt3DExtras::QPhongMaterial *cylinderMaterialI = new Qt3DExtras::QPhongMaterial(mol);
+        createCylinder(cylinderMeshI,cylinderTransformI,cylinderMaterialI);
+        cylinderListMesh << cylinderMeshI;
+        cylinderListTransform << cylinderTransformI;
+        cylinderListMaterial << cylinderMaterialI;
+
+        atomsConnections(connectionsA[i], connectionsB[i], i);
+    }
+}
+
+void ShowMolecule::createSphere(
+        Qt3DExtras::QSphereMesh *sphereMeshI,
+        Qt3DCore::QTransform *sphereTransformI,
+        Qt3DExtras::QPhongMaterial *sphereMaterialI)
+{
+    Qt3DCore::QEntity *sphereEntityI = new Qt3DCore::QEntity(mol);
+    sphereMeshI->setRadius(3);
+    sphereTransformI->setTranslation(QVector3D(0,0,0));
+    sphereMaterialI->setAmbient(Qt::green);
+    sphereEntityI->addComponent(sphereMeshI);
+    sphereEntityI->addComponent(sphereTransformI);
+    sphereEntityI->addComponent(sphereMaterialI);
+}
+
+void ShowMolecule::createCylinder(
+        Qt3DExtras::QCylinderMesh *cylinderMeshI,
+        Qt3DCore::QTransform *cylinderTransformI,
+        Qt3DExtras::QPhongMaterial *cylinderMaterialI)
+{
+    Qt3DCore::QEntity *cylinderEntityI = new Qt3DCore::QEntity(mol);
+    cylinderMeshI->setRadius(0.5);
+    cylinderMeshI->setLength(1);
+    cylinderTransformI->setTranslation(QVector3D(0,0,0));
+    cylinderMaterialI->setAmbient(Qt::gray);
+    cylinderEntityI->addComponent(cylinderMeshI);
+    cylinderEntityI->addComponent(cylinderTransformI);
+    cylinderEntityI->addComponent(cylinderMaterialI);
+}
+
+void ShowMolecule::atomsConnections(int atomA, int atomB, int bondI)
+{
+    QVector3D rAB = sphereListTransform[atomA]->translation()-sphereListTransform[atomB]->translation();
+    cylinderListTransform[bondI]->setRotation(QQuaternion::rotationTo(QVector3D(0,1,0), rAB));
+    cylinderListMesh[bondI]->setLength(rAB.length());
+    cylinderListTransform[bondI]->setTranslation(QVector3D(
+                                                 sphereListTransform[atomB]->translation()+rAB/2.0e0));
+}
 
 
-/*
- *Picking settings try
-    Qt3DRender::QRenderSettings *renderSettingsComponent = new Qt3DRender::QRenderSettings(scene);
-    Qt3DExtras::QForwardRenderer *forwardRenderer = new Qt3DExtras::QForwardRenderer();
-    forwardRenderer->setViewportRect(QRectF(0.0f, 0.0f, 1.0f, 1.0f));
-    forwardRenderer->setClearColor(Qt::green);
+void ShowMolecule::createCamera()
+{
+    Qt3DRender::QCamera *camera = molWindow->camera();
+    camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
+    camera->setPosition(QVector3D(0, 0, 80.0f));
+    camera->setViewCenter(QVector3D(0, 0, 0));
+    Qt3DExtras::QOrbitCameraController *camController = new Qt3DExtras::QOrbitCameraController(mol);
+    camController->setLinearSpeed( 50.0f );
+    camController->setLookSpeed( 180.0f );
+    camController->setCamera(camera);
+}
+
+
+
+void ShowMolecule::createPicker()
+{
+    objectPicker = new Qt3DRender::QObjectPicker(mol);
+    objectPicker->setHoverEnabled(false);
+    objectPicker->setDragEnabled(false);
+    Qt3DRender::QRenderSettings *renderSettingsComponent = new Qt3DRender::QRenderSettings(mol);
+    Qt3DExtras::QForwardRenderer *forwardRenderer = molWindow->defaultFrameGraph();
     renderSettingsComponent->setActiveFrameGraph(forwardRenderer);
-//    forwardRenderer->setCamera(camera);
-//    forwardRenderer->setClearColor(Qt::black);
-//    renderSettingsComponent->activeFrameGraph();
-//    Qt3DRender::QPickingSettings pickingSettings = renderSettingsComponent->pickingSettings();
-//    pickingSettings->setPickResultMode(Qt3DRender::QPickingSettings::AllPicks);
-    renderSettingsComponent->pickingSettings()->setPickResultMode(Qt3DRender::QPickingSettings::AllPicks);
-    scene->addComponent(renderSettingsComponent);
-*/
+    Qt3DRender::QPickingSettings *pickingSettings = renderSettingsComponent->pickingSettings();
+    pickingSettings->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
+    pickingSettings->setPickMethod(Qt3DRender::QPickingSettings::TrianglePicking);
+
+    connect(
+               objectPicker,
+               SIGNAL(clicked(Qt3DRender::QPickEvent*)),
+               this,
+               SLOT(processTouched(Qt3DRender::QPickEvent*)));
+
+    mol->addComponent(objectPicker);
+}
 
 
+
+// SLOTS
+void ShowMolecule::processTouched(Qt3DRender::QPickEvent *event)
+{
+    QVector3D inter = event->localIntersection();
+
+    qDebug() << "pick:  " << inter << "  atom:  " << atomPicked(inter);
+
+    event->setAccepted(true);
+}
+
+int ShowMolecule::atomPicked(QVector3D &worldInter)
+{
+    for(int i = 0; i < sphereListTransform.size(); i++)
+    {
+        QVector3D rApick = worldInter - sphereListTransform[i]->translation();
+        if((rApick.length()) < (sphereListMesh[i]->radius() + 5.0e0))
+        {
+            //selects just one
+            for(int j = 0; j < atomsListHighlighted.size(); j++)
+            {
+                if(atomsListHighlighted[j])
+                {
+                    if(i == j)
+                    {
+                        sphereListMaterial[j]->setAmbient(Qt::blue);
+                        atomsListHighlighted[j] = false;
+                        return i;
+                    }
+                    else
+                    {
+                        sphereListMaterial[j]->setAmbient(Qt::blue);
+                        atomsListHighlighted[j] = false;
+                        sphereListMaterial[i]->setAmbient(Qt::black);
+                        atomsListHighlighted[i] = true;
+                        return i;
+                    }
+                }
+            }
+            sphereListMaterial[i]->setAmbient(Qt::black);
+            atomsListHighlighted[i] = true;
+            return i;
+        }
+    }
+    return -1;
+}
 

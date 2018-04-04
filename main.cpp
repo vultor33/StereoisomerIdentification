@@ -54,22 +54,9 @@ int main(int argc, char *argv[])
 
     ShowMolecule mol_;
     QString fileName = "C:\\Users\\basta\\Documents\\Visual Studio 2015\\Projects\\Qt-Projects\\visual-3\\t4-isomer.mol2";
-    mol_.createMolecule(fileName);
-    Qt3DExtras::Qt3DWindow view;
-    Qt3DCore::QEntity *scene = mol_.getMolecule();
-    Qt3DRender::QCamera *camera = view.camera();
-    camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-    camera->setPosition(QVector3D(0, 0, 80.0f));
-    camera->setViewCenter(QVector3D(0, 0, 0));
-    Qt3DExtras::QOrbitCameraController *camController = new Qt3DExtras::QOrbitCameraController(scene);
-    camController->setLinearSpeed( 50.0f );
-    camController->setLookSpeed( 180.0f );
-    camController->setCamera(camera);
-    view.setRootEntity(scene);
-//    view.show();
-//    return a.exec();
+    Qt3DExtras::Qt3DWindow *view = mol_.loadMolecule(fileName);
 
-    QWidget *molBox = QWidget::createWindowContainer(&view);
+    QWidget *molBox = QWidget::createWindowContainer(view);
 
     QMdiArea *centralWidget = new QMdiArea;
     QLCDNumber *lcd = new QLCDNumber;
@@ -84,22 +71,12 @@ int main(int argc, char *argv[])
     subList[1]->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
 
-    Qt3DRender::QRenderSettings *renderSettingsComponent = new Qt3DRender::QRenderSettings(scene);
-    Qt3DExtras::QForwardRenderer *forwardRenderer = view.defaultFrameGraph();
-    renderSettingsComponent->setActiveFrameGraph(forwardRenderer);
-    Qt3DRender::QPickingSettings *pickingSettings = renderSettingsComponent->pickingSettings();
-    pickingSettings->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
-    pickingSettings->setPickMethod(Qt3DRender::QPickingSettings::TrianglePicking);
-
-    scene->addComponent(renderSettingsComponent);
-    qDebug() << "components:  " << scene->components();
-
 
 
 
     w.setCentralWidget(centralWidget);
     //w.resize(800, 600);
-    view.show();
+    view->show();
     w.show();
 
 //    mol_.readMol2Format(fileName);

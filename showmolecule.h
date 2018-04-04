@@ -5,7 +5,7 @@
 #include <Qt3DCore>
 #include <Qt3DExtras>
 #include <Qt3DRender>
-#include <QDebug>
+#include <Qt3DExtras>
 
 class ShowMolecule : QObject
 {
@@ -14,15 +14,13 @@ class ShowMolecule : QObject
 public:
     ShowMolecule();
 
-    void createMolecule(QString &fileName);
-
-    Qt3DCore::QEntity *getMolecule();
-
+    Qt3DExtras::Qt3DWindow *loadMolecule(QString &fileName);
 
 private:
+    Qt3DExtras::Qt3DWindow *molWindow;
     Qt3DCore::QEntity * mol;
 
-    //molecule characteristics
+    //Molecule characterstics
     void readMol2Format(QString &fileName);
     QString molName;
     int nAtoms, nBonds;
@@ -31,7 +29,8 @@ private:
     QList<int> connectionsA;
     QList<int> connectionsB;
 
-    // Solids definitions
+    //Shapes that appear on screen
+    void createMolecule();
     QList<Qt3DExtras::QSphereMesh*> sphereListMesh;
     QList<Qt3DCore::QTransform*> sphereListTransform;
     QList<Qt3DExtras::QPhongMaterial*> sphereListMaterial;
@@ -48,15 +47,15 @@ private:
             Qt3DExtras::QPhongMaterial *cylindermaterialI);
     void atomsConnections(int atomA, int atomB, int bondI);
 
-    // Picker functions
+    //Camera
+    void createCamera();
+
+    //Mouse clicker functions
     void createPicker();
     QList<bool> atomsListHighlighted;
     Qt3DRender::QObjectPicker *objectPicker;
     int atomPicked(QVector3D &worldInter);
-
     //emitir um sinal com atompicked e o numero que foi selecionado
-
-
 
 public slots:
     void processTouched(Qt3DRender::QPickEvent *event);
