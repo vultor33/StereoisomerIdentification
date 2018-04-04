@@ -9,6 +9,7 @@
 #include <QMdiSubWindow>
 #include <QObjectPicker>
 #include <Qt3DRender>
+#include <QCamera>
 
 #include "showmolecule.h"
 
@@ -36,10 +37,6 @@ signals:
 private:
     int m_value;
 };
-
-
-
-
 
 int main(int argc, char *argv[])
 {

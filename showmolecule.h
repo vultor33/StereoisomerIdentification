@@ -23,11 +23,13 @@ public:
     void moveMolecule(qreal x);
 
 
+    void repositionAtoms();
+
 
 private:
     Qt3DCore::QEntity * mol;
-    Qt3DRender::QObjectPicker *objectPicker;
 
+    // Solids definitions
     QList<Qt3DExtras::QSphereMesh*> sphereListMesh;
     QList<Qt3DCore::QTransform*> sphereListTransform;
     QList<Qt3DExtras::QPhongMaterial*> sphereListMaterial;
@@ -35,8 +37,6 @@ private:
             Qt3DExtras::QSphereMesh *sphereMeshI,
             Qt3DCore::QTransform *sphereTransformI,
             Qt3DExtras::QPhongMaterial *sphereMaterialI);
-
-
     QList<Qt3DExtras::QCylinderMesh*> cylinderListMesh;
     QList<Qt3DCore::QTransform*> cylinderListTransform;
     QList<Qt3DExtras::QPhongMaterial*> cylinderListMaterial;
@@ -44,9 +44,14 @@ private:
             Qt3DExtras::QCylinderMesh *cylinderMeshI,
             Qt3DCore::QTransform *cylinderTransformI,
             Qt3DExtras::QPhongMaterial *cylindermaterialI);
-
-
     void atomsConnections(int atomA, int atomB, int bondI);
+
+    // Picker functions
+    Qt3DRender::QObjectPicker *objectPicker;
+    int atomPicked(QVector3D &worldInter);
+
+
+
 
 
 

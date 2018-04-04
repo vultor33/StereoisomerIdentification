@@ -15,6 +15,7 @@
 #include <Qt3DRender>
 #include <QObjectPicker>
 #include <QPickEvent>
+#include <QGeometry>
 
 
 ShowMolecule::ShowMolecule() :
@@ -47,20 +48,13 @@ void ShowMolecule::createMolecule()
         cylinderListTransform << cylinderTransformI;
         cylinderListMaterial << cylinderMaterialI;
     }
-    sphereListTransform[0]->setTranslation(QVector3D(-15,5,12));
-    sphereListTransform[1]->setTranslation(QVector3D(15,5,-4));
-    sphereListTransform[2]->setTranslation(QVector3D(0,1,-20));
 
-    sphereListMesh[0]->setRadius(9);
-    sphereListMaterial[1]->setAmbient(Qt::green);
 
-    cylinderListTransform[0]->setTranslation(QVector3D(0,0,-15));
-    cylinderListTransform[1]->setTranslation(QVector3D(0,0,500));
-
-    atomsConnections(0,1,0);
-    atomsConnections(0,2,2);
+    repositionAtoms();
 
     cylinderListMaterial[0]->setAmbient(Qt::blue);
+
+    createPicker();
 
 
 }
@@ -106,6 +100,7 @@ void ShowMolecule::atomsConnections(int atomA, int atomB, int bondI)
 
 
 
+
 void ShowMolecule::moveMolecule(qreal x)
 {
     //sphereTransform->setTranslation(QVector3D(20,x,0));
@@ -121,14 +116,15 @@ void ShowMolecule::createPicker()
     objectPicker = new Qt3DRender::QObjectPicker(mol);
     objectPicker->setHoverEnabled(false);
     objectPicker->setDragEnabled(false);
+    Qt3DRender::QPickingSettings *settings = new Qt3DRender::QPickingSettings(objectPicker);
+    settings->setFaceOrientationPickingMode(Qt3DRender::QPickingSettings::FrontFace);
+    settings->setPickMethod(Qt3DRender::QPickingSettings::TrianglePicking);
+    settings->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
     connect(
                objectPicker,
                SIGNAL(clicked(Qt3DRender::QPickEvent*)),
-               //this,
-                //SIGNAL(testaSinal(Qt3DRender::QPickEvent*)),
                 this,
                 SLOT(processTouched(Qt3DRender::QPickEvent*)));
-                //SLOT(empty()));
     mol->addComponent(objectPicker);
 }
 
@@ -144,10 +140,51 @@ void ShowMolecule::processTouched(Qt3DRender::QPickEvent *event)
 //        return;
 //    }
 
-    //inform that the tile has been touched
-    //material2->setAmbient(Qt::blue);
-    qDebug() << "tile touched";
+    QVector3D inter = event->localIntersection();
+    qDebug() << "x: " << inter.x()
+             << "  y:  " << inter.y()
+             << "  z:  " << inter.z()
+             << "  pick:  " << atomPicked(inter);
+
     event->setAccepted(true);
 }
+
+int ShowMolecule::atomPicked(QVector3D &worldInter)
+{
+    for(int i = 0; i < sphereListTransform.size(); i++)
+    {
+        QVector3D rApick = worldInter - sphereListTransform[i]->translation();
+        qDebug() << "translation:  i: " << i << "  " << sphereListTransform[i]->translation();
+        qDebug() << "rpick:  " << rApick;
+        if((rApick.length()) < sphereListMesh[i]->radius())
+        {
+            sphereListMaterial[i]->setAmbient(Qt::blue);
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+
+void ShowMolecule::repositionAtoms()
+{
+    sphereListTransform[0]->setTranslation(QVector3D(0,0,0));
+    sphereListTransform[1]->setTranslation(QVector3D(15,5,-400));
+    sphereListTransform[2]->setTranslation(QVector3D(0,1,-200));
+
+    sphereListMesh[0]->setRadius(9);
+    sphereListMaterial[1]->setAmbient(Qt::green);
+
+    cylinderListTransform[0]->setTranslation(QVector3D(0,0,-1005));
+    cylinderListTransform[1]->setTranslation(QVector3D(0,0,500));
+
+//    atomsConnections(0,1,0);
+//    atomsConnections(0,2,2);
+
+
+
+}
+
 
 
