@@ -4,6 +4,7 @@
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
 #include <Qt3DCore/QAspectEngine>
+#include <QQuaternion>
 
 #include <Qt3DRender/QRenderAspect>
 #include <Qt3DExtras/QForwardRenderer>
@@ -18,8 +19,6 @@
 
 ShowMolecule::ShowMolecule() :
     mol(nullptr),
-    sphereTransform(nullptr),
-    material2(nullptr),
     objectPicker(nullptr)
 {
 
@@ -28,69 +27,88 @@ ShowMolecule::ShowMolecule() :
 
 void ShowMolecule::createMolecule()
 {
-    // Root entity
-    Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity;
+    mol = new Qt3DCore::QEntity;
 
-    // Material
-    Qt3DRender::QMaterial *material = new Qt3DExtras::QPhongMaterial(rootEntity);
+    for(size_t  i =0; i < 3; i++)
+    {
+        Qt3DExtras::QSphereMesh *sphereMeshI = new Qt3DExtras::QSphereMesh;
+        Qt3DCore::QTransform *sphereTransformI = new Qt3DCore::QTransform;
+        Qt3DExtras::QPhongMaterial *sphereMaterialI = new Qt3DExtras::QPhongMaterial(mol);
+        createSphere(sphereMeshI,sphereTransformI,sphereMaterialI);
+        sphereListMesh << sphereMeshI;
+        sphereListTransform << sphereTransformI;
+        sphereListMaterial << sphereMaterialI;
 
-    // Torus
-    /*
-    Qt3DCore::QEntity *torusEntity = new Qt3DCore::QEntity(rootEntity);
-    Qt3DExtras::QTorusMesh *torusMesh = new Qt3DExtras::QTorusMesh;
-    torusMesh->setRadius(10);
-    torusMesh->setMinorRadius(1);
-    torusMesh->setRings(100);
-    torusMesh->setSlices(20);
+        Qt3DExtras::QCylinderMesh *cylinderMeshI = new Qt3DExtras::QCylinderMesh;
+        Qt3DCore::QTransform *cylinderTransformI = new Qt3DCore::QTransform;
+        Qt3DExtras::QPhongMaterial *cylinderMaterialI = new Qt3DExtras::QPhongMaterial(mol);
+        createCylinder(cylinderMeshI,cylinderTransformI,cylinderMaterialI);
+        cylinderListMesh << cylinderMeshI;
+        cylinderListTransform << cylinderTransformI;
+        cylinderListMaterial << cylinderMaterialI;
+    }
+    sphereListTransform[0]->setTranslation(QVector3D(-15,5,12));
+    sphereListTransform[1]->setTranslation(QVector3D(15,5,-4));
+    sphereListTransform[2]->setTranslation(QVector3D(0,1,-20));
 
-    Qt3DCore::QTransform *torusTransform = new Qt3DCore::QTransform;
-    torusTransform->setScale3D(QVector3D(1.5, 1, 0.5));
-    torusTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 45.0f));
+    sphereListMesh[0]->setRadius(9);
+    sphereListMaterial[1]->setAmbient(Qt::green);
 
-    torusEntity->addComponent(torusMesh);
-    torusEntity->addComponent(torusTransform);
-    torusEntity->addComponent(material);
-*/
+    cylinderListTransform[0]->setTranslation(QVector3D(0,0,-15));
+    cylinderListTransform[1]->setTranslation(QVector3D(0,0,500));
 
-    // Cyllineter
-    Qt3DCore::QEntity *cyllinderEntity = new Qt3DCore::QEntity(rootEntity);
-    Qt3DExtras::QCylinderMesh *cyllinderMesh = new Qt3DExtras::QCylinderMesh;
-    cyllinderMesh->setRadius(0.5);
-    cyllinderMesh->setLength(7);
-    Qt3DCore::QTransform *cylinderTransform = new Qt3DCore::QTransform;
-    QVector3D qVec = QVector3D(2,3,4);
-    cylinderTransform->setTranslation(qVec);
-    cylinderTransform->setRotationX(40);
-    cylinderTransform->setRotationY(20);
-    Qt3DExtras::QPhongMaterial *material3 = new Qt3DExtras::QPhongMaterial(rootEntity);
-    material3->setAmbient(Qt::green);
+    atomsConnections(0,1,0);
+    atomsConnections(0,2,2);
 
-    cyllinderEntity->addComponent(cyllinderMesh);
-    cyllinderEntity->addComponent(cylinderTransform);
-    cyllinderEntity->addComponent(material3);
-
-
-    // Sphere
-    Qt3DCore::QEntity *sphereEntity = new Qt3DCore::QEntity(rootEntity);
-    Qt3DExtras::QSphereMesh *sphereMesh = new Qt3DExtras::QSphereMesh;
-    sphereMesh->setRadius(3);
-    sphereTransform = new Qt3DCore::QTransform;
-    sphereTransform->setTranslation(QVector3D(20,2,0));
-    material2 = new Qt3DExtras::QPhongMaterial(rootEntity);
-    material2->setAmbient(Qt::red);
-
-    sphereEntity->addComponent(sphereMesh);
-    sphereEntity->addComponent(sphereTransform);
-    sphereEntity->addComponent(material2);
-
-    mol = rootEntity;
+    cylinderListMaterial[0]->setAmbient(Qt::blue);
 
 
 }
 
+void ShowMolecule::createSphere(
+        Qt3DExtras::QSphereMesh *sphereMeshI,
+        Qt3DCore::QTransform *sphereTransformI,
+        Qt3DExtras::QPhongMaterial *sphereMaterialI)
+{
+    Qt3DCore::QEntity *sphereEntityI = new Qt3DCore::QEntity(mol);
+    sphereMeshI->setRadius(3);
+    sphereTransformI->setTranslation(QVector3D(0,0,0));
+    sphereMaterialI->setAmbient(Qt::black);
+    sphereEntityI->addComponent(sphereMeshI);
+    sphereEntityI->addComponent(sphereTransformI);
+    sphereEntityI->addComponent(sphereMaterialI);
+}
+
+void ShowMolecule::createCylinder(
+        Qt3DExtras::QCylinderMesh *cylinderMeshI,
+        Qt3DCore::QTransform *cylinderTransformI,
+        Qt3DExtras::QPhongMaterial *cylinderMaterialI)
+{
+    Qt3DCore::QEntity *cylinderEntityI = new Qt3DCore::QEntity(mol);
+    cylinderMeshI->setRadius(1);
+    cylinderMeshI->setLength(10);
+    cylinderTransformI->setTranslation(QVector3D(0,0,0));
+    cylinderMaterialI->setAmbient(Qt::black);
+    cylinderEntityI->addComponent(cylinderMeshI);
+    cylinderEntityI->addComponent(cylinderTransformI);
+    cylinderEntityI->addComponent(cylinderMaterialI);
+}
+
+void ShowMolecule::atomsConnections(int atomA, int atomB, int bondI)
+{
+    QVector3D rAB = sphereListTransform[atomA]->translation()-sphereListTransform[atomB]->translation();
+    cylinderListTransform[bondI]->setRotation(QQuaternion::rotationTo(QVector3D(0,1,0), rAB));
+    cylinderListMesh[bondI]->setLength(rAB.length());
+    cylinderListTransform[bondI]->setTranslation(QVector3D(
+                                                 sphereListTransform[atomB]->translation()+rAB/2.0e0));
+}
+
+
+
+
 void ShowMolecule::moveMolecule(qreal x)
 {
-    sphereTransform->setTranslation(QVector3D(20,x,0));
+    //sphereTransform->setTranslation(QVector3D(20,x,0));
 }
 
 Qt3DCore::QEntity *ShowMolecule::getMolecule()
@@ -127,7 +145,7 @@ void ShowMolecule::processTouched(Qt3DRender::QPickEvent *event)
 //    }
 
     //inform that the tile has been touched
-    material2->setAmbient(Qt::blue);
+    //material2->setAmbient(Qt::blue);
     qDebug() << "tile touched";
     event->setAccepted(true);
 }

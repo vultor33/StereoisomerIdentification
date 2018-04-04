@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
 
     ShowMolecule mol_;
     mol_.createMolecule();
-    mol_.moveMolecule(60);
     Qt3DExtras::Qt3DWindow view;
     Qt3DCore::QEntity *scene = mol_.getMolecule();
     Qt3DRender::QCamera *camera = view.camera();
@@ -61,7 +60,6 @@ int main(int argc, char *argv[])
     camController->setLookSpeed( 180.0f );
     camController->setCamera(camera);
     view.setRootEntity(scene);
-    //
 
     QWidget *molBox = QWidget::createWindowContainer(&view);
 
@@ -72,17 +70,10 @@ int main(int argc, char *argv[])
     centralWidget->addSubWindow(lcd);
     centralWidget->addSubWindow(molBox);
     QList<QMdiSubWindow *> subList = centralWidget->subWindowList();
-    subList[1]->setFixedHeight(200);
-    subList[1]->setFixedWidth(200);
-    subList[1]->move(QPoint(100,100));
+    subList[1]->setFixedHeight(600);
+    subList[1]->setFixedWidth(600);
+    //subList[1]->move(QPoint(100,100));
     subList[1]->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-
-
-
-    //Input
-//    addComponent(objectPicker);
-
-
 
 
     w.setCentralWidget(centralWidget);
@@ -90,8 +81,7 @@ int main(int argc, char *argv[])
     view.show();
     w.show();
 
-    mol_.moveMolecule(10);
-    mol_.createPicker();
+//    mol_.createPicker();
 
     return a.exec();
 }
