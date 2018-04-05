@@ -19,6 +19,7 @@
 #include <fstream>
 #include <string>
 #include <QViewport>
+#include <QObject>
 
 #include "showmolecule.h"
 
@@ -51,35 +52,36 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     QMainWindow w;
+    w.setWindowTitle("Complex Identification");
+    QMdiArea *centralWidget = new QMdiArea;
 
+    //molecule
     ShowMolecule mol_;
     QString fileName = "C:\\Users\\basta\\Documents\\Visual Studio 2015\\Projects\\Qt-Projects\\visual-3\\t4-isomer.mol2";
     Qt3DExtras::Qt3DWindow *view = mol_.loadMolecule(fileName);
-
     QWidget *molBox = QWidget::createWindowContainer(view);
-
-    QMdiArea *centralWidget = new QMdiArea;
-    QLCDNumber *lcd = new QLCDNumber;
-    lcd->display(1337);
-    lcd->setMinimumSize(250, 100);
-    centralWidget->addSubWindow(lcd);
     centralWidget->addSubWindow(molBox);
+
+    //in
+    MainWindow interface;
+    centralWidget->addSubWindow(&interface);
+    interface.setMolName(mol_.getMolName());
+    interface.setSelAtom("");
+
+    interface.connectWithMol(&mol_);
+
     QList<QMdiSubWindow *> subList = centralWidget->subWindowList();
+    subList[0]->setFixedHeight(600);
+    subList[0]->setFixedWidth(600);
+    subList[0]->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     subList[1]->setFixedHeight(600);
     subList[1]->setFixedWidth(600);
-    //subList[1]->move(QPoint(100,100));
     subList[1]->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-
-
-
-
-
     w.setCentralWidget(centralWidget);
-    //w.resize(800, 600);
-    view->show();
-    w.show();
+    w.setFixedHeight(600);
+    w.setFixedWidth(1200);
 
-//    mol_.readMol2Format(fileName);
+    w.show();
 
     return a.exec();
 }

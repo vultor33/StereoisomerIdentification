@@ -24,6 +24,12 @@ ShowMolecule::ShowMolecule() :
     mol(nullptr),
     objectPicker(nullptr)
 {
+    atomTypes << "Au" << "P" << "N" << "O";
+    defaultColors << Qt::yellow << Qt::green << Qt::blue << Qt::red;
+
+    sphereRadius = 3;
+    cylinderRadius = 0.5;
+    coordinatesScaleFactor = 8.0e0;
 
 }
 
@@ -54,7 +60,6 @@ void ShowMolecule::readMol2Format(QString &fileName)
         QMessageBox::information(0, "error", file.errorString());
     }
     QTextStream in(&file);
-    qreal scaleFactor = 8;
     while(!in.atEnd())
     {
         QString line = in.readLine();
@@ -79,9 +84,9 @@ void ShowMolecule::readMol2Format(QString &fileName)
                 QString lineI = in.readLine();
                 QTextStream convertI(&lineI);
                 convertI >> dum1 >> dum2 >> x >> y >> z >> label;
-                x *= scaleFactor;
-                y *= scaleFactor;
-                z *= scaleFactor;
+                x *= coordinatesScaleFactor;
+                y *= coordinatesScaleFactor;
+                z *= coordinatesScaleFactor;
                 QVector3D auxVecPositions = QVector3D(x,y,z);
                 atomCoordinates << auxVecPositions;
                 atomLabels << label;
@@ -136,7 +141,7 @@ void ShowMolecule::createMolecule()
         sphereListTransform << sphereTransformI;
         sphereListMaterial << sphereMaterialI;
         atomsListHighlighted << false;
-
+        setDefaultColor(i);
         sphereListTransform[i]->setTranslation(atomCoordinates[i]);
     }
 
@@ -174,7 +179,7 @@ void ShowMolecule::createCylinder(
         Qt3DExtras::QPhongMaterial *cylinderMaterialI)
 {
     Qt3DCore::QEntity *cylinderEntityI = new Qt3DCore::QEntity(mol);
-    cylinderMeshI->setRadius(0.5);
+    cylinderMeshI->setRadius(cylinderRadius);
     cylinderMeshI->setLength(1);
     cylinderTransformI->setTranslation(QVector3D(0,0,0));
     cylinderMaterialI->setAmbient(Qt::gray);
@@ -191,6 +196,20 @@ void ShowMolecule::atomsConnections(int atomA, int atomB, int bondI)
     cylinderListTransform[bondI]->setTranslation(QVector3D(
                                                  sphereListTransform[atomB]->translation()+rAB/2.0e0));
 }
+
+void ShowMolecule::setDefaultColor(int atomI)
+{
+    for(int i = 0; i <atomTypes.size(); i++)
+    {
+        if(atomLabels[atomI] == atomTypes[i])
+        {
+            sphereListMaterial[atomI]->setAmbient(defaultColors[i]);
+            return;
+        }
+    }
+    sphereListMaterial[atomI]->setAmbient(Qt::gray);
+}
+
 
 
 void ShowMolecule::createCamera()
@@ -235,7 +254,7 @@ void ShowMolecule::processTouched(Qt3DRender::QPickEvent *event)
 {
     QVector3D inter = event->localIntersection();
 
-    qDebug() << "pick:  " << inter << "  atom:  " << atomPicked(inter);
+    atomPicked(inter);
 
     event->setAccepted(true);
 }
@@ -254,25 +273,36 @@ int ShowMolecule::atomPicked(QVector3D &worldInter)
                 {
                     if(i == j)
                     {
-                        sphereListMaterial[j]->setAmbient(Qt::blue);
+                        setDefaultColor(j);
                         atomsListHighlighted[j] = false;
+                        emit atomWasSelected(" ");
                         return i;
                     }
                     else
                     {
-                        sphereListMaterial[j]->setAmbient(Qt::blue);
+                        setDefaultColor(j);
                         atomsListHighlighted[j] = false;
                         sphereListMaterial[i]->setAmbient(Qt::black);
                         atomsListHighlighted[i] = true;
+                        emit atomWasSelected(QString::number(i));
                         return i;
                     }
                 }
             }
             sphereListMaterial[i]->setAmbient(Qt::black);
             atomsListHighlighted[i] = true;
+            emit atomWasSelected(QString::number(i));
             return i;
         }
     }
     return -1;
+}
+
+
+void ShowMolecule::reescaleReceiving(qreal reescale)
+{
+    for(int i = 0; i < nAtoms; i++)
+        sphereListMesh[i]->setRadius(reescale);
+
 }
 

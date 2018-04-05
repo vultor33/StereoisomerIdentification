@@ -6,8 +6,9 @@
 #include <Qt3DExtras>
 #include <Qt3DRender>
 #include <Qt3DExtras>
+#include <QColor>
 
-class ShowMolecule : QObject
+class ShowMolecule : public QObject
 {
     Q_OBJECT
 
@@ -15,6 +16,8 @@ public:
     ShowMolecule();
 
     Qt3DExtras::Qt3DWindow *loadMolecule(QString &fileName);
+
+    QString getMolName(){ return molName; }
 
 private:
     Qt3DExtras::Qt3DWindow *molWindow;
@@ -31,6 +34,7 @@ private:
 
     //Shapes that appear on screen
     void createMolecule();
+    qreal sphereRadius, cylinderRadius, coordinatesScaleFactor;
     QList<Qt3DExtras::QSphereMesh*> sphereListMesh;
     QList<Qt3DCore::QTransform*> sphereListTransform;
     QList<Qt3DExtras::QPhongMaterial*> sphereListMaterial;
@@ -46,6 +50,9 @@ private:
             Qt3DCore::QTransform *cylinderTransformI,
             Qt3DExtras::QPhongMaterial *cylindermaterialI);
     void atomsConnections(int atomA, int atomB, int bondI);
+    QList<QColor> defaultColors;
+    QList<QString> atomTypes;
+    void setDefaultColor(int atomI);
 
     //Camera
     void createCamera();
@@ -55,10 +62,15 @@ private:
     QList<bool> atomsListHighlighted;
     Qt3DRender::QObjectPicker *objectPicker;
     int atomPicked(QVector3D &worldInter);
-    //emitir um sinal com atompicked e o numero que foi selecionado
 
 public slots:
     void processTouched(Qt3DRender::QPickEvent *event);
+
+    void reescaleReceiving(qreal reescale);
+
+signals:
+    void atomWasSelected(QString selAtom);
+
 
 };
 
