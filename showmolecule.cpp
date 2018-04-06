@@ -29,7 +29,7 @@ ShowMolecule::ShowMolecule() :
 
     sphereRadius = 3;
     cylinderRadius = 0.5;
-    coordinatesScaleFactor = 8.0e0;
+    coordinatesScaleFactor = 3.0e0;
 
 }
 

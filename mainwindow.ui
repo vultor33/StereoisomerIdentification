@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>502</width>
     <height>600</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>531</width>
+      <width>311</width>
       <height>80</height>
      </rect>
     </property>
@@ -28,7 +28,7 @@
       <widget class="QLabel" name="label">
        <property name="font">
         <font>
-         <pointsize>20</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
@@ -40,7 +40,7 @@
       <widget class="QLabel" name="molName">
        <property name="font">
         <font>
-         <pointsize>20</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
@@ -55,7 +55,7 @@
      <rect>
       <x>20</x>
       <y>120</y>
-      <width>531</width>
+      <width>311</width>
       <height>80</height>
      </rect>
     </property>
@@ -64,7 +64,7 @@
       <widget class="QLabel" name="label_2">
        <property name="font">
         <font>
-         <pointsize>20</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
@@ -114,7 +114,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>502</width>
      <height>21</height>
     </rect>
    </property>
