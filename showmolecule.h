@@ -15,9 +15,10 @@ class ShowMolecule : public QObject
 public:
     ShowMolecule();
 
-    Qt3DExtras::Qt3DWindow *loadMolecule(QString &fileName);
-
     QString getMolName(){ return molName; }
+
+    Qt3DExtras::Qt3DWindow *showMoleculeInitialization();
+
 
 private:
     Qt3DExtras::Qt3DWindow *molWindow;
@@ -62,8 +63,11 @@ private:
     QList<bool> atomsListHighlighted;
     Qt3DRender::QObjectPicker *objectPicker;
     int atomPicked(QVector3D &worldInter);
+    qreal radiusTolerance;
 
 public slots:
+    void loadMolecule(QString fileName);
+
     void processTouched(Qt3DRender::QPickEvent *event);
 
     void reescaleReceiving(qreal reescale);

@@ -25,11 +25,13 @@ private:
     Ui::MainWindow *ui;
 
 public slots:
+    void on_buttonLoadMolecule_clicked();
     void on_buttonReescale_clicked();
     void setSelAtom(QString selAtom);
 
 signals:
     void reescaleClicked(qreal reescale);
+    void loadMoleculeClicked(QString fileName);
 
 
 };

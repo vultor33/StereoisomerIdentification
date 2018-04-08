@@ -27,11 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    showmolecule.cpp
+    showmolecule.cpp \
+    openfilewindows.cpp
 
 HEADERS += \
         mainwindow.h \
-    showmolecule.h
+    showmolecule.h \
+    openfilewindows.h
 
 FORMS += \
         mainwindow.ui

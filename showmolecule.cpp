@@ -30,16 +30,15 @@ ShowMolecule::ShowMolecule() :
     sphereRadius = 3;
     cylinderRadius = 0.5;
     coordinatesScaleFactor = 3.0e0;
+    radiusTolerance = 2.0;
 
 }
 
-Qt3DExtras::Qt3DWindow *ShowMolecule::loadMolecule(QString &fileName)
+Qt3DExtras::Qt3DWindow *ShowMolecule::showMoleculeInitialization()
 {
     molWindow = new Qt3DExtras::Qt3DWindow;
 
-    readMol2Format(fileName);
-
-    createMolecule();
+    mol = new Qt3DCore::QEntity;
 
     createCamera();
 
@@ -51,13 +50,20 @@ Qt3DExtras::Qt3DWindow *ShowMolecule::loadMolecule(QString &fileName)
 
 }
 
+void ShowMolecule::loadMolecule(QString fileName)
+{
+    // resetar a anterior com cuidado -- tirar do Qt3DCore::QEntity mol e etc.
 
+    readMol2Format(fileName);
+}
 
 void ShowMolecule::readMol2Format(QString &fileName)
 {
     QFile file(fileName);
+    qDebug() << "file name:  " << fileName;
     if(!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0, "error", file.errorString());
+        QMessageBox::information(0, fileName + " not found", file.errorString());
+        return;
     }
     QTextStream in(&file);
     while(!in.atEnd())
@@ -125,12 +131,13 @@ void ShowMolecule::readMol2Format(QString &fileName)
     */
 
     file.close();
+
+    createMolecule();
+
 }
 
 void ShowMolecule::createMolecule()
 {
-    mol = new Qt3DCore::QEntity;
-
     for(int  i = 0; i < nAtoms; i++)
     {
         Qt3DExtras::QSphereMesh *sphereMeshI = new Qt3DExtras::QSphereMesh;
@@ -264,7 +271,7 @@ int ShowMolecule::atomPicked(QVector3D &worldInter)
     for(int i = 0; i < sphereListTransform.size(); i++)
     {
         QVector3D rApick = worldInter - sphereListTransform[i]->translation();
-        if((rApick.length()) < (sphereListMesh[i]->radius() + 5.0e0))
+        if((rApick.length()) < (sphereListMesh[i]->radius() + radiusTolerance))
         {
             //selects just one
             for(int j = 0; j < atomsListHighlighted.size(); j++)

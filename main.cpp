@@ -20,33 +20,9 @@
 #include <string>
 #include <QViewport>
 #include <QObject>
+#include <QFileDialog>
 
 #include "showmolecule.h"
-
-class Counter : public QObject
-{
-    Q_OBJECT
-
-public:
-    Counter() { m_value = 0; }
-
-    int value() const { return m_value; }
-
-public slots:
-    void setValue(int value){ m_value = value;}
-
-signals:
-    void valueChanged(int newValue)
-    {
-        if (newValue != m_value) {
-            m_value = newValue;
-            emit valueChanged(newValue);
-        }
-    }
-
-private:
-    int m_value;
-};
 
 int main(int argc, char *argv[])
 {
@@ -59,7 +35,7 @@ int main(int argc, char *argv[])
     ShowMolecule mol_;
     QString fileName = "C:\\Users\\basta\\Documents\\Visual Studio 2015\\Projects\\Qt-Projects\\visual-3\\t4-isomer.mol2";
     //Qt3DExtras::Qt3DWindow *view = mol_.loadMolecule(fileName);
-    Qt3DExtras::Qt3DWindow *view = mol_.loadMolecule(fileName);
+    Qt3DExtras::Qt3DWindow *view = mol_.showMoleculeInitialization();
     QWidget *molBox = QWidget::createWindowContainer(view);
     centralWidget->addSubWindow(molBox);
 
@@ -73,8 +49,7 @@ int main(int argc, char *argv[])
 
     //molecule2
     ShowMolecule mol2_;
-    QString fileName2 = "C:\\Users\\basta\\Documents\\Visual Studio 2015\\Projects\\Qt-Projects\\visual-3\\t4-isomer.mol2";
-    Qt3DExtras::Qt3DWindow *view2 = mol2_.loadMolecule(fileName2);
+    Qt3DExtras::Qt3DWindow *view2 = mol2_.showMoleculeInitialization();
     QWidget *molBox2 = QWidget::createWindowContainer(view2);
     centralWidget->addSubWindow(molBox2);
 
@@ -102,7 +77,7 @@ int main(int argc, char *argv[])
 /*
  *QOrbitCameraController
  *  -  Tem que usar o botao direito do mouse para rodar.
- *  -  Talvez eu devesse adicionar um botao de reset view e/ou desativar o uso do botao direito.
+ *  -  Talvez eu devesse adicionar um botao de reset view e/ou desativar o uso do botao esquerdo.
  *
  *
  *
