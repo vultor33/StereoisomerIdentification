@@ -11,6 +11,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    selectedAtomsLeft.label1 = "";
+    selectedAtomsLeft.label2 = "";
+
 }
 
 MainWindow::~MainWindow()
@@ -29,13 +32,13 @@ void MainWindow::connectWithMol(ShowMolecule *mol_)
 void MainWindow::setMolName(QString fileName){
     QString nameOnly = fileName.mid(fileName.lastIndexOf("/") + 1);
     ui->molName->setText(nameOnly.left(nameOnly.size() - 5));
-    AtomsX atom0;
-    atom0.label1 = "";
-    atom0.label2 = "";
-    setSelAtom(atom0);
+    selectedAtomsLeft.label1 = "";
+    selectedAtomsLeft.label2 = "";
+    setSelAtom(selectedAtomsLeft);
 }
 
 void MainWindow::setSelAtom(AtomsX atom0){
+    selectedAtomsLeft = atom0;
     ui->atomSel->setText("");
     ui->atomLabel->setText("");
     ui->atomX->setText("");
@@ -79,5 +82,41 @@ void MainWindow::on_buttonLoadMolecule_clicked()
     QString fileName = open.loadMoleculeWindow();
 
     emit loadMoleculeClicked(fileName);
+}
+
+void MainWindow::on_buttonDefineMetal_clicked()
+{
+    if((selectedAtomsLeft.label1 == "") || (selectedAtomsLeft.label2 != ""))
+    {
+        ui->definitionMessages->setText("This definitions needs one atom selected.");
+        return;
+    }
+
+    ui->definitionMessages->setText("");
+    qDebug() << "define atom";
+}
+
+void MainWindow::on_buttonDefineMono_clicked()
+{
+    if((selectedAtomsLeft.label1 == "") || (selectedAtomsLeft.label2 != ""))
+    {
+        ui->definitionMessages->setText("This definitions needs one atom selected.");
+        return;
+    }
+
+    ui->definitionMessages->setText("");
+    qDebug() << "define mono";
+}
+
+void MainWindow::on_buttonDefineBi_clicked()
+{
+    if(selectedAtomsLeft.label2 == "")
+    {
+           ui->definitionMessages->setText("This definitions needs two atoms selected.");
+           return;
+    }
+
+    ui->definitionMessages->setText("");
+    qDebug() << "define bi";
 }
 

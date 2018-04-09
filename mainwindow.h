@@ -23,10 +23,17 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    AtomsX selectedAtomsLeft;
+
+
 public slots:
-    void on_buttonLoadMolecule_clicked();
     void setSelAtom(AtomsX atom0);
     void setMolName(QString fileName);
+    void on_buttonLoadMolecule_clicked();
+    void on_buttonDefineMetal_clicked();
+    void on_buttonDefineMono_clicked();
+    void on_buttonDefineBi_clicked();
+
 
 signals:
     void loadMoleculeClicked(QString fileName);
