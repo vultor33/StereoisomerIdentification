@@ -33,26 +33,23 @@ int main(int argc, char *argv[])
 
     //molecule
     ShowMolecule mol_;
-    QString fileName = "C:\\Users\\basta\\Documents\\Visual Studio 2015\\Projects\\Qt-Projects\\visual-3\\t4-isomer.mol2";
-    //Qt3DExtras::Qt3DWindow *view = mol_.loadMolecule(fileName);
     Qt3DExtras::Qt3DWindow *view = mol_.showMoleculeInitialization();
     QWidget *molBox = QWidget::createWindowContainer(view);
-    centralWidget->addSubWindow(molBox);
-
-    //in
-    MainWindow interface;
-    centralWidget->addSubWindow(&interface);
-    interface.setMolName(mol_.getMolName());
-    interface.setSelAtom("");
-
-    interface.connectWithMol(&mol_);
 
     //molecule2
     ShowMolecule mol2_;
     Qt3DExtras::Qt3DWindow *view2 = mol2_.showMoleculeInitialization();
     QWidget *molBox2 = QWidget::createWindowContainer(view2);
-    centralWidget->addSubWindow(molBox2);
 
+    //interface
+    MainWindow interface;
+    interface.setMolName(mol_.getMolName());
+    interface.setSelAtom("");
+    interface.connectWithMol(&mol_);
+
+    centralWidget->addSubWindow(molBox);
+    centralWidget->addSubWindow(&interface);
+    centralWidget->addSubWindow(molBox2);
 
     QList<QMdiSubWindow *> subList = centralWidget->subWindowList();
     subList[0]->setFixedHeight(600);
@@ -79,7 +76,11 @@ int main(int argc, char *argv[])
  *  -  Tem que usar o botao direito do mouse para rodar.
  *  -  Talvez eu devesse adicionar um botao de reset view e/ou desativar o uso do botao esquerdo.
  *
- *
+ *PERIGOS
+ * Warning:
+ * No shader program found for DNA
+ * - acho que acontece pq meu void ShowMolecule::cleanMol()
+ *   usa deleteLater para limpar a memoria.
  *
  *
  *

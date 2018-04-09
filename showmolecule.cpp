@@ -34,6 +34,14 @@ ShowMolecule::ShowMolecule() :
 
 }
 
+ShowMolecule::~ShowMolecule()
+{
+    delete [] objectPicker;
+    delete [] mol;
+    delete [] molWindow;
+}
+
+
 Qt3DExtras::Qt3DWindow *ShowMolecule::showMoleculeInitialization()
 {
     molWindow = new Qt3DExtras::Qt3DWindow;
@@ -54,6 +62,8 @@ void ShowMolecule::loadMolecule(QString fileName)
 {
     // resetar a anterior com cuidado -- tirar do Qt3DCore::QEntity mol e etc.
 
+    cleanMol();
+
     readMol2Format(fileName);
 }
 
@@ -65,6 +75,7 @@ void ShowMolecule::readMol2Format(QString &fileName)
         QMessageBox::information(0, fileName + " not found", file.errorString());
         return;
     }
+    emit molNameDefined(fileName);
     QTextStream in(&file);
     while(!in.atEnd())
     {
@@ -140,8 +151,8 @@ void ShowMolecule::createMolecule()
 {
     for(int  i = 0; i < nAtoms; i++)
     {
-        Qt3DExtras::QSphereMesh *sphereMeshI = new Qt3DExtras::QSphereMesh;
-        Qt3DCore::QTransform *sphereTransformI = new Qt3DCore::QTransform;
+        Qt3DExtras::QSphereMesh *sphereMeshI = new Qt3DExtras::QSphereMesh(mol);
+        Qt3DCore::QTransform *sphereTransformI = new Qt3DCore::QTransform(mol);
         Qt3DExtras::QPhongMaterial *sphereMaterialI = new Qt3DExtras::QPhongMaterial(mol);
         createSphere(sphereMeshI,sphereTransformI,sphereMaterialI);
         sphereListMesh << sphereMeshI;
@@ -154,8 +165,8 @@ void ShowMolecule::createMolecule()
 
     for(int i = 0; i < nBonds; i++)
     {
-        Qt3DExtras::QCylinderMesh *cylinderMeshI = new Qt3DExtras::QCylinderMesh;
-        Qt3DCore::QTransform *cylinderTransformI = new Qt3DCore::QTransform;
+        Qt3DExtras::QCylinderMesh *cylinderMeshI = new Qt3DExtras::QCylinderMesh(mol);
+        Qt3DCore::QTransform *cylinderTransformI = new Qt3DCore::QTransform(mol);
         Qt3DExtras::QPhongMaterial *cylinderMaterialI = new Qt3DExtras::QPhongMaterial(mol);
         createCylinder(cylinderMeshI,cylinderTransformI,cylinderMaterialI);
         cylinderListMesh << cylinderMeshI;
@@ -216,6 +227,31 @@ void ShowMolecule::setDefaultColor(int atomI)
     }
     sphereListMaterial[atomI]->setAmbient(Qt::gray);
 }
+
+void ShowMolecule::cleanMol()
+{
+    Qt3DCore::QNodeVector listChild =  mol->childNodes();
+    for(int i = 3; i < listChild.size(); i++)
+    {
+        listChild[i]->deleteLater();
+    }
+
+    sphereListMaterial.clear();
+    sphereListMesh.clear();
+    sphereListTransform.clear();
+    cylinderListMaterial.clear();
+    cylinderListMesh.clear();
+    cylinderListTransform.clear();
+    atomsListHighlighted.clear();
+    atomLabels.clear();
+    atomCoordinates.clear();
+    connectionsA.clear();
+    connectionsB.clear();
+    molName = "";
+    nAtoms = 0;
+    nBonds = 0;
+}
+
 
 
 
@@ -303,13 +339,5 @@ int ShowMolecule::atomPicked(QVector3D &worldInter)
         }
     }
     return -1;
-}
-
-
-void ShowMolecule::reescaleReceiving(qreal reescale)
-{
-    for(int i = 0; i < nAtoms; i++)
-        sphereListMesh[i]->setRadius(reescale);
-
 }
 

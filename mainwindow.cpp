@@ -21,23 +21,19 @@ MainWindow::~MainWindow()
 void MainWindow::connectWithMol(ShowMolecule *mol_)
 {
     connect(mol_, SIGNAL(atomWasSelected(QString)), this, SLOT(setSelAtom(QString)));
-    connect(this, SIGNAL(reescaleClicked(qreal)),mol_,SLOT(reescaleReceiving(qreal)));
     connect(this, SIGNAL(loadMoleculeClicked(QString)),mol_,SLOT(loadMolecule(QString)));
+    connect(mol_, SIGNAL(molNameDefined(QString)), this,SLOT(setMolName(QString)));
 }
 
 
-
-void MainWindow::setMolName(const QString &name){
-    //ui->molName->setText(name);
+void MainWindow::setMolName(QString fileName){
+    QString nameOnly = fileName.mid(fileName.lastIndexOf("/") + 1);
+    ui->molName->setText(nameOnly.left(nameOnly.size() - 5));
+    ui->atomSel->setText("");
 }
 
 void MainWindow::setSelAtom(QString selAtom){
     ui->atomSel->setText(selAtom);
-}
-
-void MainWindow::on_buttonReescale_clicked()
-{
-    emit reescaleClicked(ui->lineReescale->text().toFloat());
 }
 
 void MainWindow::on_buttonLoadMolecule_clicked()
@@ -47,7 +43,4 @@ void MainWindow::on_buttonLoadMolecule_clicked()
 
     emit loadMoleculeClicked(fileName);
 }
-
-
-
 

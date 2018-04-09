@@ -19,19 +19,18 @@ public:
 
     void connectWithMol(ShowMolecule *mol_);
 
-    void setMolName(const QString &name);
 
 private:
     Ui::MainWindow *ui;
 
 public slots:
     void on_buttonLoadMolecule_clicked();
-    void on_buttonReescale_clicked();
     void setSelAtom(QString selAtom);
+    void setMolName(QString fileName);
 
 signals:
-    void reescaleClicked(qreal reescale);
     void loadMoleculeClicked(QString fileName);
+
 
 
 };

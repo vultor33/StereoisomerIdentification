@@ -15,6 +15,8 @@ class ShowMolecule : public QObject
 public:
     ShowMolecule();
 
+    ~ShowMolecule();
+
     QString getMolName(){ return molName; }
 
     Qt3DExtras::Qt3DWindow *showMoleculeInitialization();
@@ -22,37 +24,40 @@ public:
 
 private:
     Qt3DExtras::Qt3DWindow *molWindow;
-    Qt3DCore::QEntity * mol;
+    Qt3DCore::QEntity *mol;
+
+    //default mol properties
+    qreal sphereRadius, cylinderRadius, coordinatesScaleFactor;
+    QList<QColor> defaultColors;
+    QList<QString> atomTypes;
 
     //Molecule characterstics
-    void readMol2Format(QString &fileName);
-    QString molName;
     int nAtoms, nBonds;
+    QString molName;
     QList<QString> atomLabels;
     QList<QVector3D> atomCoordinates;
     QList<int> connectionsA;
     QList<int> connectionsB;
+    void readMol2Format(QString &fileName);
+    void cleanMol();
 
     //Shapes that appear on screen
-    void createMolecule();
-    qreal sphereRadius, cylinderRadius, coordinatesScaleFactor;
     QList<Qt3DExtras::QSphereMesh*> sphereListMesh;
     QList<Qt3DCore::QTransform*> sphereListTransform;
     QList<Qt3DExtras::QPhongMaterial*> sphereListMaterial;
+    QList<Qt3DExtras::QCylinderMesh*> cylinderListMesh;
+    QList<Qt3DCore::QTransform*> cylinderListTransform;
+    QList<Qt3DExtras::QPhongMaterial*> cylinderListMaterial;
+    void createMolecule();
     void createSphere(
             Qt3DExtras::QSphereMesh *sphereMeshI,
             Qt3DCore::QTransform *sphereTransformI,
             Qt3DExtras::QPhongMaterial *sphereMaterialI);
-    QList<Qt3DExtras::QCylinderMesh*> cylinderListMesh;
-    QList<Qt3DCore::QTransform*> cylinderListTransform;
-    QList<Qt3DExtras::QPhongMaterial*> cylinderListMaterial;
     void createCylinder(
             Qt3DExtras::QCylinderMesh *cylinderMeshI,
             Qt3DCore::QTransform *cylinderTransformI,
             Qt3DExtras::QPhongMaterial *cylindermaterialI);
     void atomsConnections(int atomA, int atomB, int bondI);
-    QList<QColor> defaultColors;
-    QList<QString> atomTypes;
     void setDefaultColor(int atomI);
 
     //Camera
@@ -70,10 +75,10 @@ public slots:
 
     void processTouched(Qt3DRender::QPickEvent *event);
 
-    void reescaleReceiving(qreal reescale);
 
 signals:
     void atomWasSelected(QString selAtom);
+    void molNameDefined(QString molName);
 
 
 };
