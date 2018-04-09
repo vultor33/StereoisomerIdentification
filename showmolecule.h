@@ -8,6 +8,13 @@
 #include <Qt3DExtras>
 #include <QColor>
 
+struct AtomX
+{
+    int atomOrderNumber;
+    QString label;
+    QVector3D coord;
+};
+
 class ShowMolecule : public QObject
 {
     Q_OBJECT
@@ -77,7 +84,7 @@ public slots:
 
 
 signals:
-    void atomWasSelected(QString selAtom);
+    void atomWasSelected(AtomX);
     void molNameDefined(QString molName);
 
 

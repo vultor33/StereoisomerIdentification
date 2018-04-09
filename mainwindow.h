@@ -25,7 +25,7 @@ private:
 
 public slots:
     void on_buttonLoadMolecule_clicked();
-    void setSelAtom(QString selAtom);
+    void setSelAtom(AtomX atom0);
     void setMolName(QString fileName);
 
 signals:

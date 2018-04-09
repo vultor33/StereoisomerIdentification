@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     //interface
     MainWindow interface;
     interface.setMolName(mol_.getMolName());
-    interface.setSelAtom("");
+    //interface.setSelAtom("");
     interface.connectWithMol(&mol_);
 
     centralWidget->addSubWindow(molBox);

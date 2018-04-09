@@ -318,7 +318,9 @@ int ShowMolecule::atomPicked(QVector3D &worldInter)
                     {
                         setDefaultColor(j);
                         atomsListHighlighted[j] = false;
-                        emit atomWasSelected(" ");
+                        AtomX atom0;
+                        atom0.label = "";
+                        emit atomWasSelected(atom0);
                         return i;
                     }
                     else
@@ -327,14 +329,22 @@ int ShowMolecule::atomPicked(QVector3D &worldInter)
                         atomsListHighlighted[j] = false;
                         sphereListMaterial[i]->setAmbient(Qt::black);
                         atomsListHighlighted[i] = true;
-                        emit atomWasSelected(QString::number(i));
+                        AtomX atom0;
+                        atom0.label = atomLabels[i];
+                        atom0.coord = atomCoordinates[i];
+                        atom0.atomOrderNumber = i;
+                        emit atomWasSelected(atom0);
                         return i;
                     }
                 }
             }
             sphereListMaterial[i]->setAmbient(Qt::black);
             atomsListHighlighted[i] = true;
-            emit atomWasSelected(QString::number(i));
+            AtomX atom0;
+            atom0.label = atomLabels[i];
+            atom0.coord = atomCoordinates[i];
+            atom0.atomOrderNumber = i;
+            emit atomWasSelected(atom0);
             return i;
         }
     }
