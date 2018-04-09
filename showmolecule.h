@@ -8,11 +8,14 @@
 #include <Qt3DExtras>
 #include <QColor>
 
-struct AtomX
+struct AtomsX
 {
-    int atomOrderNumber;
-    QString label;
-    QVector3D coord;
+    int atomOrderNumber1;
+    QString label1;
+    QVector3D coord1;
+    int atomOrderNumber2;
+    QString label2;
+    QVector3D coord2;
 };
 
 class ShowMolecule : public QObject
@@ -71,20 +74,21 @@ private:
     void createCamera();
 
     //Mouse clicker functions
-    void createPicker();
+    int nAtomsHighlighted;
     QList<bool> atomsListHighlighted;
     Qt3DRender::QObjectPicker *objectPicker;
-    int atomPicked(QVector3D &worldInter);
     qreal radiusTolerance;
+    void createPicker();
+    int atomPicked(QVector3D &worldInter);
+    void sendPickMessage();
 
 public slots:
     void loadMolecule(QString fileName);
-
     void processTouched(Qt3DRender::QPickEvent *event);
 
 
 signals:
-    void atomWasSelected(AtomX);
+    void atomWasSelected(AtomsX);
     void molNameDefined(QString molName);
 
 

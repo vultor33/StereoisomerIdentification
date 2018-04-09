@@ -243,6 +243,7 @@ void ShowMolecule::cleanMol()
     cylinderListMesh.clear();
     cylinderListTransform.clear();
     atomsListHighlighted.clear();
+    nAtomsHighlighted = 0;
     atomLabels.clear();
     atomCoordinates.clear();
     connectionsA.clear();
@@ -309,45 +310,68 @@ int ShowMolecule::atomPicked(QVector3D &worldInter)
         QVector3D rApick = worldInter - sphereListTransform[i]->translation();
         if((rApick.length()) < (sphereListMesh[i]->radius() + radiusTolerance))
         {
-            //selects just one
+            if(atomsListHighlighted[i])
+            {
+                setDefaultColor(i);
+                atomsListHighlighted[i] = false;
+                nAtomsHighlighted--;
+                sendPickMessage();
+                return i;
+            }
             for(int j = 0; j < atomsListHighlighted.size(); j++)
             {
+                if(i == j)
+                    continue;
                 if(atomsListHighlighted[j])
                 {
-                    if(i == j)
+                    if(nAtomsHighlighted > 1)
                     {
-                        setDefaultColor(j);
-                        atomsListHighlighted[j] = false;
-                        AtomX atom0;
-                        atom0.label = "";
-                        emit atomWasSelected(atom0);
-                        return i;
+                            setDefaultColor(j);
+                            atomsListHighlighted[j] = false;
+                            nAtomsHighlighted--;
                     }
-                    else
-                    {
-                        setDefaultColor(j);
-                        atomsListHighlighted[j] = false;
-                        sphereListMaterial[i]->setAmbient(Qt::black);
-                        atomsListHighlighted[i] = true;
-                        AtomX atom0;
-                        atom0.label = atomLabels[i];
-                        atom0.coord = atomCoordinates[i];
-                        atom0.atomOrderNumber = i;
-                        emit atomWasSelected(atom0);
-                        return i;
-                    }
+                    sphereListMaterial[i]->setAmbient(Qt::black);
+                    atomsListHighlighted[i] = true;
+                    nAtomsHighlighted++;
+                    sendPickMessage();
+                    return i;
                 }
             }
             sphereListMaterial[i]->setAmbient(Qt::black);
             atomsListHighlighted[i] = true;
-            AtomX atom0;
-            atom0.label = atomLabels[i];
-            atom0.coord = atomCoordinates[i];
-            atom0.atomOrderNumber = i;
-            emit atomWasSelected(atom0);
+            nAtomsHighlighted++;
+            sendPickMessage();
             return i;
         }
     }
     return -1;
 }
+
+void ShowMolecule::sendPickMessage()
+{
+    AtomsX atom0;
+    bool first = true;
+    atom0.label1 = "";
+    atom0.label2 = "";
+    for(int i = 0; i < atomsListHighlighted.size(); i++)
+    {
+        if(atomsListHighlighted[i] && first)
+        {
+            atom0.label1 = atomLabels[i];
+            atom0.coord1 = atomCoordinates[i];
+            atom0.atomOrderNumber1 = i;
+            first = false;
+            qDebug() << "first:  " << atom0.label1;
+        }
+        else if(atomsListHighlighted[i])
+        {
+            atom0.label2 = atomLabels[i];
+            atom0.coord2 = atomCoordinates[i];
+            atom0.atomOrderNumber2 = i;
+            qDebug() << "second:  " << atom0.label2;
+        }
+    }
+    emit atomWasSelected(atom0);
+}
+
 
