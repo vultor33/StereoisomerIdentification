@@ -24,12 +24,12 @@ ShowMolecule::ShowMolecule() :
     mol(nullptr),
     objectPicker(nullptr)
 {
-    atomTypes << "Au" << "P" << "N" << "O";
-    defaultColors << Qt::yellow << Qt::green << Qt::blue << Qt::red;
+    atomTypes << "Au" << "P" << "N" << "O" << "C" << "H";
+    defaultColors << Qt::yellow << Qt::green << Qt::blue << Qt::red << Qt::gray << Qt::white;
 
     sphereRadius = 3;
     cylinderRadius = 0.5;
-    coordinatesScaleFactor = 3.0e0;
+    coordinatesScaleFactor = 7.0e0;
     radiusTolerance = 2.0;
 
 }
@@ -260,12 +260,12 @@ void ShowMolecule::createCamera()
 {
     Qt3DRender::QCamera *camera = molWindow->camera();
     camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-    camera->setPosition(QVector3D(0, 0, 80.0f));
+    camera->setPosition(QVector3D(0, 0, 200.0f));
     camera->setViewCenter(QVector3D(0, 0, 0));
     Qt3DExtras::QOrbitCameraController *camController = new Qt3DExtras::QOrbitCameraController(mol);
-    camController->setLinearSpeed( 50.0f );
+    camController->setLinearSpeed( 400.0f );
     camController->setLookSpeed( 180.0f );
-    camController->setCamera(camera);
+
 }
 
 
@@ -358,7 +358,7 @@ void ShowMolecule::sendPickMessage()
         if(atomsListHighlighted[i] && first)
         {
             atom0.label1 = atomLabels[i];
-            atom0.coord1 = atomCoordinates[i];
+            atom0.coord1 = atomCoordinates[i] / coordinatesScaleFactor;
             atom0.atomOrderNumber1 = i;
             first = false;
             qDebug() << "first:  " << atom0.label1;
@@ -366,7 +366,7 @@ void ShowMolecule::sendPickMessage()
         else if(atomsListHighlighted[i])
         {
             atom0.label2 = atomLabels[i];
-            atom0.coord2 = atomCoordinates[i];
+            atom0.coord2 = atomCoordinates[i] / coordinatesScaleFactor;
             atom0.atomOrderNumber2 = i;
             qDebug() << "second:  " << atom0.label2;
         }
