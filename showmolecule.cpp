@@ -19,10 +19,13 @@
 #include <QMessageBox>
 #include <QComponentVector>
 
+#include "myorbitcontroller.h"
+
 ShowMolecule::ShowMolecule() :
     molWindow(nullptr),
     mol(nullptr),
-    objectPicker(nullptr)
+    objectPicker(nullptr),
+    camController(nullptr)
 {
     atomTypes << "Au" << "P" << "N" << "O" << "C" << "H";
     defaultColors << Qt::yellow << Qt::green << Qt::blue << Qt::red << Qt::gray << Qt::white;
@@ -39,6 +42,7 @@ ShowMolecule::~ShowMolecule()
     delete [] objectPicker;
     delete [] mol;
     delete [] molWindow;
+    delete [] camController;
 }
 
 
@@ -262,8 +266,10 @@ void ShowMolecule::createCamera()
     camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
     camera->setPosition(QVector3D(0, 0, 200.0f));
     camera->setViewCenter(QVector3D(0, 0, 0));
-    Qt3DExtras::QOrbitCameraController *camController = new Qt3DExtras::QOrbitCameraController(mol);
-    camController->setLinearSpeed( 400.0f );
+    camController = new MyOrbitController(mol);
+    //Qt3DExtras::QOrbitCameraController *camController = new Qt3DExtras::QOrbitCameraController(mol);
+    camController->setCamera(camera);
+    camController->setLinearSpeed( 800.0f );
     camController->setLookSpeed( 180.0f );
 
 }

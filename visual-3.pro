@@ -28,12 +28,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     showmolecule.cpp \
-    openfilewindows.cpp
+    openfilewindows.cpp \
+    myorbitcontroller.cpp
 
 HEADERS += \
         mainwindow.h \
     showmolecule.h \
-    openfilewindows.h
+    openfilewindows.h \
+    myorbitcontroller.h
 
 FORMS += \
         mainwindow.ui

@@ -8,6 +8,8 @@
 #include <Qt3DExtras>
 #include <QColor>
 
+#include "myorbitcontroller.h"
+
 struct AtomsX
 {
     int atomOrderNumber1;
@@ -71,6 +73,7 @@ private:
     void setDefaultColor(int atomI);
 
     //Camera
+    MyOrbitController *camController;
     void createCamera();
 
     //Mouse clicker functions

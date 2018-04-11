@@ -92,8 +92,11 @@ void MainWindow::on_buttonDefineMetal_clicked()
         return;
     }
 
+    //camController->setCameraViewCenterToPos(sphereListTransform[4]->translation());
+
+
     ui->definitionMessages->setText("");
-    qDebug() << "define atom";
+    qDebug() << "define atom - configure camera to center here";
 }
 
 void MainWindow::on_buttonDefineMono_clicked()
