@@ -5,9 +5,11 @@
 #include <Qt3DExtras>
 
 MyOrbitController::MyOrbitController(Qt3DCore::QNode *parent)
-    : QAbstractCameraController(parent)
+    : QAbstractCameraController(parent),
+      camera2(nullptr)
 {
     in_zoom_limit = 20.0;
+    camera2Enabled = false;
 }
 
 MyOrbitController::~MyOrbitController()
@@ -29,6 +31,8 @@ void MyOrbitController::moveCamera(const InputState &state, float dt)
         else
         {
             theCamera->translate(QVector3D(0, 0, state.ryAxisValue * lookSpeed() / 10.0), theCamera->DontTranslateViewCenter);
+            if(camera2Enabled)
+                camera2->translate(QVector3D(0, 0, state.ryAxisValue * lookSpeed() / 10.0), theCamera->DontTranslateViewCenter);
             return;
         }
     }
@@ -36,6 +40,11 @@ void MyOrbitController::moveCamera(const InputState &state, float dt)
         // Orbit
         theCamera->panAboutViewCenter((state.rxAxisValue * lookSpeed()) * dt, upVector);
         theCamera->tiltAboutViewCenter((state.ryAxisValue * lookSpeed()) * dt);
+        if(camera2Enabled)
+        {
+            camera2->panAboutViewCenter((state.rxAxisValue * lookSpeed()) * dt, upVector);
+            camera2->tiltAboutViewCenter((state.ryAxisValue * lookSpeed()) * dt);
+        }
         return;
     }
 
@@ -88,6 +97,11 @@ void MyOrbitController::setCameraViewCenterToPos(QVector3D pos)
 {
     Qt3DRender::QCamera *theCamera = camera();
     theCamera->setViewCenter(pos);
+    camera2->setViewCenter(pos);
 }
 
-
+void MyOrbitController::setCamera2(Qt3DRender::QCamera *camera)
+{
+    camera2Enabled = true;
+    camera2 = camera;
+}

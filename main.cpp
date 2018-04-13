@@ -24,6 +24,9 @@
 
 #include "showmolecule.h"
 
+// MEU CLIENTE QUER CONFIGURACAO ABSOLUTA. - vou avisar que o mol2 correto e necessario e confiar nele.
+// MEU CLIENTE GOSTARIA QUE FUNCIONASSE EM METALLOCAGES TAMBEM.
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -40,6 +43,10 @@ int main(int argc, char *argv[])
     ShowMolecule mol2_;
     Qt3DExtras::Qt3DWindow *view2 = mol2_.showMoleculeInitialization(1);
     QWidget *molBox2 = QWidget::createWindowContainer(view2);
+
+
+    mol_.linkOtherCamera(view2);
+    mol2_.linkOtherCamera(view);
 
     // conectar as duas cameras?
 

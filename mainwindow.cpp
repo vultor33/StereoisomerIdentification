@@ -28,6 +28,7 @@ void MainWindow::connectWithMol(ShowMolecule *mol_, ShowMolecule *mol2_)
     connect(this, SIGNAL(loadMoleculeClicked(QString)), mol2_, SLOT(loadMolecule(QString)));
     connect(mol_, SIGNAL(molNameDefined(QString)), this, SLOT(setMolName(QString)));
     connect(this, SIGNAL(cameraCentralize(QVector3D)), mol_, SLOT(setCameraCenter(QVector3D)));
+    connect(this, SIGNAL(enableDisableAtom(int,bool)), mol2_, SLOT(setSphereEnabled(int,bool)));
 }
 
 
@@ -96,6 +97,7 @@ void MainWindow::on_buttonDefineMetal_clicked()
     ui->definitionMessages->setText("");
 
     emit cameraCentralize(selectedAtomsLeft.coord1);
+    emit enableDisableAtom(selectedAtomsLeft.atomOrderNumber1,true);
     qDebug() << "define atom - configure camera to center here";
 }
 
@@ -106,6 +108,8 @@ void MainWindow::on_buttonDefineMono_clicked()
         ui->definitionMessages->setText("This definitions needs one atom selected.");
         return;
     }
+
+    emit enableDisableAtom(selectedAtomsLeft.atomOrderNumber1,true);
 
     ui->definitionMessages->setText("");
     qDebug() << "define mono";

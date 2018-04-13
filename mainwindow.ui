@@ -241,7 +241,7 @@
      <rect>
       <x>10</x>
       <y>60</y>
-      <width>131</width>
+      <width>251</width>
       <height>21</height>
      </rect>
     </property>
@@ -251,7 +251,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Selected atoms</string>
+     <string>Click on left window atoms to highlight them</string>
     </property>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget">

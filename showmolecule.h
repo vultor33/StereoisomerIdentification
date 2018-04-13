@@ -33,7 +33,7 @@ public:
 
     Qt3DExtras::Qt3DWindow *showMoleculeInitialization(int player_in = 0);
 
-    MyOrbitController *camController;
+    void linkOtherCamera(Qt3DExtras::Qt3DWindow *molWindow2);
 
 private:
     int player;
@@ -76,6 +76,8 @@ private:
 
     //Camera
     void createCamera();
+    MyOrbitController *camController;
+
 
     //Mouse clicker functions
     int nAtomsHighlighted;
@@ -90,6 +92,7 @@ public slots:
     void loadMolecule(QString fileName);
     void processTouched(Qt3DRender::QPickEvent *event);
     void setCameraCenter(QVector3D newCenter);
+    void setSphereEnabled(int i, bool enabled);
 
 
 signals:

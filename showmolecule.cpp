@@ -165,8 +165,8 @@ void ShowMolecule::createMolecule()
         setDefaultColor(i);
         sphereListTransform[i]->setTranslation(atomCoordinates[i]);
 
-        //if(player == 1)
-        //    sphereListMesh[i]->setEnabled(false);
+        if(player == 1)
+            sphereListMesh[i]->setEnabled(false);
     }
 
     if(player == 1)
@@ -273,7 +273,6 @@ void ShowMolecule::createCamera()
     camera->setPosition(QVector3D(0, 0, 200.0f));
     camera->setViewCenter(QVector3D(0, 0, 0));
     camController = new MyOrbitController(mol);
-    //Qt3DExtras::QOrbitCameraController *camController = new Qt3DExtras::QOrbitCameraController(mol);
     camController->setCamera(camera);
     camController->setLinearSpeed( 3000.0f );
     camController->setLookSpeed( 180.0f );
@@ -283,6 +282,12 @@ void ShowMolecule::createCamera()
 void ShowMolecule::setCameraCenter(QVector3D newCenter)
 {
     camController->setCameraViewCenterToPos(coordinatesScaleFactor * newCenter);
+}
+
+void ShowMolecule::linkOtherCamera(Qt3DExtras::Qt3DWindow *window2)
+{
+    Qt3DRender::QCamera *camera2 = window2->camera();
+    camController->setCamera2(camera2);
 }
 
 
@@ -301,6 +306,9 @@ void ShowMolecule::createPicker()
     connect(objectPicker, SIGNAL(clicked(Qt3DRender::QPickEvent*)), this, SLOT(processTouched(Qt3DRender::QPickEvent*)));
 
     mol->addComponent(objectPicker);
+
+    if(player == 1)
+        objectPicker->setEnabled(false);
 }
 
 
@@ -390,5 +398,15 @@ void ShowMolecule::sendPickMessage()
     }
     emit atomWasSelected(atom0);
 }
+
+void ShowMolecule::setSphereEnabled(int i, bool enabled)
+{
+    sphereListMesh[i]->setEnabled(enabled);
+}
+
+
+
+
+
 
 
