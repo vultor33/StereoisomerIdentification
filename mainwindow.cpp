@@ -24,8 +24,9 @@ MainWindow::~MainWindow()
 void MainWindow::connectWithMol(ShowMolecule *mol_)
 {
     connect(mol_, SIGNAL(atomWasSelected(AtomsX)), this, SLOT(setSelAtom(AtomsX)));
-    connect(this, SIGNAL(loadMoleculeClicked(QString)),mol_,SLOT(loadMolecule(QString)));
-    connect(mol_, SIGNAL(molNameDefined(QString)), this,SLOT(setMolName(QString)));
+    connect(this, SIGNAL(loadMoleculeClicked(QString)), mol_, SLOT(loadMolecule(QString)));
+    connect(mol_, SIGNAL(molNameDefined(QString)), this, SLOT(setMolName(QString)));
+    connect(this, SIGNAL(cameraCentralize(QVector3D)), mol_, SLOT(setCameraCenter(QVector3D)));
 }
 
 
@@ -91,11 +92,9 @@ void MainWindow::on_buttonDefineMetal_clicked()
         ui->definitionMessages->setText("This definitions needs one atom selected.");
         return;
     }
-
-    //camController->setCameraViewCenterToPos(sphereListTransform[4]->translation());
-
-
     ui->definitionMessages->setText("");
+
+    emit cameraCentralize(selectedAtomsLeft.coord1);
     qDebug() << "define atom - configure camera to center here";
 }
 

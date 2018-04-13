@@ -88,12 +88,12 @@ private:
 public slots:
     void loadMolecule(QString fileName);
     void processTouched(Qt3DRender::QPickEvent *event);
+    void setCameraCenter(QVector3D newCenter);
 
 
 signals:
     void atomWasSelected(AtomsX);
     void molNameDefined(QString molName);
-
 
 };
 

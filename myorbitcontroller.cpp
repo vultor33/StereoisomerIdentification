@@ -16,8 +16,6 @@ MyOrbitController::~MyOrbitController()
 
 void MyOrbitController::moveCamera(const InputState &state, float dt)
 {
-    qDebug() << "entrou no move";
-
     Qt3DRender::QCamera *theCamera = camera();
 
     if (theCamera == nullptr)
@@ -30,7 +28,7 @@ void MyOrbitController::moveCamera(const InputState &state, float dt)
                 return;
         else
         {
-            theCamera->translate(QVector3D(0, 0, state.ryAxisValue * lookSpeed() * dt), theCamera->DontTranslateViewCenter);
+            theCamera->translate(QVector3D(0, 0, state.ryAxisValue * lookSpeed() / 10.0), theCamera->DontTranslateViewCenter);
             return;
         }
     }
@@ -38,34 +36,8 @@ void MyOrbitController::moveCamera(const InputState &state, float dt)
         // Orbit
         theCamera->panAboutViewCenter((state.rxAxisValue * lookSpeed()) * dt, upVector);
         theCamera->tiltAboutViewCenter((state.ryAxisValue * lookSpeed()) * dt);
-    }
-
-
-
-    /*
-    if (state.leftMouseButtonActive)
-    {
-        if (state.rightMouseButtonActive)
-        {
-            if ( zoomDistance(camera()->position(), theCamera->viewCenter()) > d->m_zoomInLimit * d->m_zoomInLimit)
-            {
-                // Dolly up to limit
-                theCamera->translate(QVector3D(0, 0, state.ryAxisValue), theCamera->DontTranslateViewCenter);
-            } else
-            {
-                theCamera->translate(QVector3D(0, 0, -0.5), theCamera->DontTranslateViewCenter);
-            }
-        } else
-        {
-            // Translate
-            theCamera->translate(QVector3D(clampInputs(state.rxAxisValue, state.txAxisValue) * linearSpeed(),
-                                          clampInputs(state.ryAxisValue, state.tyAxisValue) * linearSpeed(),
-                                          0) * dt);
-        }
         return;
     }
-    */
-
 
     /*  QOrbitCameraController
     Qt3DRender::QCamera *theCamera = camera();
@@ -110,7 +82,6 @@ void MyOrbitController::moveCamera(const InputState &state, float dt)
 */
 
 }
-
 
 
 void MyOrbitController::setCameraViewCenterToPos(QVector3D pos)

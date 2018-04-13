@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
     Qt3DExtras::Qt3DWindow *view2 = mol2_.showMoleculeInitialization();
     QWidget *molBox2 = QWidget::createWindowContainer(view2);
 
+    // conectar as duas cameras?
+
     //interface
     MainWindow interface;
     interface.setMolName(mol_.getMolName());
@@ -81,9 +83,6 @@ int main(int argc, char *argv[])
  * No shader program found for DNA
  * - acho que acontece pq meu void ShowMolecule::cleanMol()
  *   usa deleteLater para limpar a memoria.
- *
- *
- *
  *
  *
  */

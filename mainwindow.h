@@ -37,6 +37,7 @@ public slots:
 
 signals:
     void loadMoleculeClicked(QString fileName);
+    void cameraCentralize(QVector3D newCenter);
 
 
 

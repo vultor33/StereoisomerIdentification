@@ -24,8 +24,8 @@
 ShowMolecule::ShowMolecule() :
     molWindow(nullptr),
     mol(nullptr),
-    objectPicker(nullptr),
-    camController(nullptr)
+    camController(nullptr),
+    objectPicker(nullptr)
 {
     atomTypes << "Au" << "P" << "N" << "O" << "C" << "H";
     defaultColors << Qt::yellow << Qt::green << Qt::blue << Qt::red << Qt::gray << Qt::white;
@@ -34,15 +34,14 @@ ShowMolecule::ShowMolecule() :
     cylinderRadius = 0.5;
     coordinatesScaleFactor = 7.0e0;
     radiusTolerance = 2.0;
-
 }
 
 ShowMolecule::~ShowMolecule()
 {
     delete [] objectPicker;
     delete [] mol;
-    delete [] molWindow;
     delete [] camController;
+    delete [] molWindow;
 }
 
 
@@ -64,8 +63,6 @@ Qt3DExtras::Qt3DWindow *ShowMolecule::showMoleculeInitialization()
 
 void ShowMolecule::loadMolecule(QString fileName)
 {
-    // resetar a anterior com cuidado -- tirar do Qt3DCore::QEntity mol e etc.
-
     cleanMol();
 
     readMol2Format(fileName);
@@ -74,7 +71,6 @@ void ShowMolecule::loadMolecule(QString fileName)
 void ShowMolecule::readMol2Format(QString &fileName)
 {
     QFile file(fileName);
-    qDebug() << "file name:  " << fileName;
     if(!file.open(QIODevice::ReadOnly)) {
         QMessageBox::information(0, fileName + " not found", file.errorString());
         return;
@@ -181,6 +177,7 @@ void ShowMolecule::createMolecule()
     }
 }
 
+
 void ShowMolecule::createSphere(
         Qt3DExtras::QSphereMesh *sphereMeshI,
         Qt3DCore::QTransform *sphereTransformI,
@@ -269,11 +266,15 @@ void ShowMolecule::createCamera()
     camController = new MyOrbitController(mol);
     //Qt3DExtras::QOrbitCameraController *camController = new Qt3DExtras::QOrbitCameraController(mol);
     camController->setCamera(camera);
-    camController->setLinearSpeed( 800.0f );
+    camController->setLinearSpeed( 3000.0f );
     camController->setLookSpeed( 180.0f );
 
 }
 
+void ShowMolecule::setCameraCenter(QVector3D newCenter)
+{
+    camController->setCameraViewCenterToPos(coordinatesScaleFactor * newCenter);
+}
 
 
 void ShowMolecule::createPicker()
@@ -288,11 +289,7 @@ void ShowMolecule::createPicker()
     pickingSettings->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
     pickingSettings->setPickMethod(Qt3DRender::QPickingSettings::TrianglePicking);
 
-    connect(
-               objectPicker,
-               SIGNAL(clicked(Qt3DRender::QPickEvent*)),
-               this,
-               SLOT(processTouched(Qt3DRender::QPickEvent*)));
+    connect(objectPicker, SIGNAL(clicked(Qt3DRender::QPickEvent*)), this, SLOT(processTouched(Qt3DRender::QPickEvent*)));
 
     mol->addComponent(objectPicker);
 }
@@ -336,17 +333,23 @@ int ShowMolecule::atomPicked(QVector3D &worldInter)
                             atomsListHighlighted[j] = false;
                             nAtomsHighlighted--;
                     }
-                    sphereListMaterial[i]->setAmbient(Qt::black);
-                    atomsListHighlighted[i] = true;
-                    nAtomsHighlighted++;
-                    sendPickMessage();
+                    if(sphereListMesh[i]->isEnabled())
+                    {
+                        sphereListMaterial[i]->setAmbient(Qt::black);
+                        atomsListHighlighted[i] = true;
+                        nAtomsHighlighted++;
+                        sendPickMessage();
+                    }
                     return i;
                 }
             }
-            sphereListMaterial[i]->setAmbient(Qt::black);
-            atomsListHighlighted[i] = true;
-            nAtomsHighlighted++;
-            sendPickMessage();
+            if(sphereListMesh[i]->isEnabled())
+            {
+                sphereListMaterial[i]->setAmbient(Qt::black);
+                atomsListHighlighted[i] = true;
+                nAtomsHighlighted++;
+                sendPickMessage();
+            }
             return i;
         }
     }
@@ -359,6 +362,7 @@ void ShowMolecule::sendPickMessage()
     bool first = true;
     atom0.label1 = "";
     atom0.label2 = "";
+
     for(int i = 0; i < atomsListHighlighted.size(); i++)
     {
         if(atomsListHighlighted[i] && first)
@@ -367,14 +371,12 @@ void ShowMolecule::sendPickMessage()
             atom0.coord1 = atomCoordinates[i] / coordinatesScaleFactor;
             atom0.atomOrderNumber1 = i;
             first = false;
-            qDebug() << "first:  " << atom0.label1;
         }
         else if(atomsListHighlighted[i])
         {
             atom0.label2 = atomLabels[i];
             atom0.coord2 = atomCoordinates[i] / coordinatesScaleFactor;
             atom0.atomOrderNumber2 = i;
-            qDebug() << "second:  " << atom0.label2;
         }
     }
     emit atomWasSelected(atom0);
