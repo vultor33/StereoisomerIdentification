@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
     //molecule2
     ShowMolecule mol2_;
-    Qt3DExtras::Qt3DWindow *view2 = mol2_.showMoleculeInitialization();
+    Qt3DExtras::Qt3DWindow *view2 = mol2_.showMoleculeInitialization(1);
     QWidget *molBox2 = QWidget::createWindowContainer(view2);
 
     // conectar as duas cameras?
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     MainWindow interface;
     interface.setMolName(mol_.getMolName());
     //interface.setSelAtom("");
-    interface.connectWithMol(&mol_);
+    interface.connectWithMol(&mol_, &mol2_);
 
     centralWidget->addSubWindow(molBox);
     centralWidget->addSubWindow(&interface);

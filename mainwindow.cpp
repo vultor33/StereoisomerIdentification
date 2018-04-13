@@ -21,10 +21,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::connectWithMol(ShowMolecule *mol_)
+void MainWindow::connectWithMol(ShowMolecule *mol_, ShowMolecule *mol2_)
 {
     connect(mol_, SIGNAL(atomWasSelected(AtomsX)), this, SLOT(setSelAtom(AtomsX)));
     connect(this, SIGNAL(loadMoleculeClicked(QString)), mol_, SLOT(loadMolecule(QString)));
+    connect(this, SIGNAL(loadMoleculeClicked(QString)), mol2_, SLOT(loadMolecule(QString)));
     connect(mol_, SIGNAL(molNameDefined(QString)), this, SLOT(setMolName(QString)));
     connect(this, SIGNAL(cameraCentralize(QVector3D)), mol_, SLOT(setCameraCenter(QVector3D)));
 }

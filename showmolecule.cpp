@@ -27,6 +27,7 @@ ShowMolecule::ShowMolecule() :
     camController(nullptr),
     objectPicker(nullptr)
 {
+    player = 0;
     atomTypes << "Au" << "P" << "N" << "O" << "C" << "H";
     defaultColors << Qt::yellow << Qt::green << Qt::blue << Qt::red << Qt::gray << Qt::white;
 
@@ -45,8 +46,10 @@ ShowMolecule::~ShowMolecule()
 }
 
 
-Qt3DExtras::Qt3DWindow *ShowMolecule::showMoleculeInitialization()
+Qt3DExtras::Qt3DWindow *ShowMolecule::showMoleculeInitialization(int player_in)
 {
+    player = player_in;
+
     molWindow = new Qt3DExtras::Qt3DWindow;
 
     mol = new Qt3DCore::QEntity;
@@ -161,7 +164,13 @@ void ShowMolecule::createMolecule()
         atomsListHighlighted << false;
         setDefaultColor(i);
         sphereListTransform[i]->setTranslation(atomCoordinates[i]);
+
+        //if(player == 1)
+        //    sphereListMesh[i]->setEnabled(false);
     }
+
+    if(player == 1)
+        return;
 
     for(int i = 0; i < nBonds; i++)
     {

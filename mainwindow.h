@@ -17,7 +17,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void connectWithMol(ShowMolecule *mol_);
+    void connectWithMol(ShowMolecule *mol_, ShowMolecule *mol2_);
 
 
 private:

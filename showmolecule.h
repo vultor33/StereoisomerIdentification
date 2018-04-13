@@ -31,10 +31,12 @@ public:
 
     QString getMolName(){ return molName; }
 
-    Qt3DExtras::Qt3DWindow *showMoleculeInitialization();
+    Qt3DExtras::Qt3DWindow *showMoleculeInitialization(int player_in = 0);
 
+    MyOrbitController *camController;
 
 private:
+    int player;
     Qt3DExtras::Qt3DWindow *molWindow;
     Qt3DCore::QEntity *mol;
 
@@ -73,7 +75,6 @@ private:
     void setDefaultColor(int atomI);
 
     //Camera
-    MyOrbitController *camController;
     void createCamera();
 
     //Mouse clicker functions
