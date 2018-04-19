@@ -35,6 +35,14 @@ public:
 
     void linkOtherCamera(Qt3DExtras::Qt3DWindow *molWindow2);
 
+protected:
+    QList<Qt3DExtras::QSphereMesh*> sphereListMesh;
+    QList<Qt3DCore::QTransform*> sphereListTransform;
+    QList<Qt3DExtras::QPhongMaterial*> sphereListMaterial;
+    QList<Qt3DExtras::QCylinderMesh*> cylinderListMesh;
+    QList<Qt3DCore::QTransform*> cylinderListTransform;
+    QList<Qt3DExtras::QPhongMaterial*> cylinderListMaterial;
+
 private:
     int player;
     Qt3DExtras::Qt3DWindow *molWindow;
@@ -56,12 +64,6 @@ private:
     void cleanMol();
 
     //Shapes that appear on screen
-    QList<Qt3DExtras::QSphereMesh*> sphereListMesh;
-    QList<Qt3DCore::QTransform*> sphereListTransform;
-    QList<Qt3DExtras::QPhongMaterial*> sphereListMaterial;
-    QList<Qt3DExtras::QCylinderMesh*> cylinderListMesh;
-    QList<Qt3DCore::QTransform*> cylinderListTransform;
-    QList<Qt3DExtras::QPhongMaterial*> cylinderListMaterial;
     void createMolecule();
     void createSphere(
             Qt3DExtras::QSphereMesh *sphereMeshI,

@@ -29,13 +29,17 @@ SOURCES += \
         mainwindow.cpp \
     showmolecule.cpp \
     openfilewindows.cpp \
-    myorbitcontroller.cpp
+    myorbitcontroller.cpp \
+    complexidentificationmanager.cpp \
+    custommolecule.cpp
 
 HEADERS += \
         mainwindow.h \
     showmolecule.h \
     openfilewindows.h \
-    myorbitcontroller.h
+    myorbitcontroller.h \
+    complexidentificationmanager.h \
+    custommolecule.h
 
 FORMS += \
         mainwindow.ui
